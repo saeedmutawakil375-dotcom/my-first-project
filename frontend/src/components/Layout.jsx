@@ -4,7 +4,7 @@ const Layout = ({ children }) => {
   return (
     <div className="news-shell min-h-screen">
       <Navbar />
-      <main className="mx-auto max-w-[92rem] px-4 py-6 sm:px-6 sm:py-8 lg:px-8">{children}</main>
+      <main className="mx-auto max-w-[94rem] px-3 py-4 sm:px-5 sm:py-6 lg:px-8 lg:py-8">{children}</main>
     </div>
   );
 };

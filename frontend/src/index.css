@@ -1,19 +1,19 @@
-@import url("https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&family=Source+Sans+3:wght@400;500;600;700;800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap");
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --news-bg: #eef2f7;
-  --news-surface: #ffffff;
-  --news-panel: #f8fafc;
-  --news-ink: #09111f;
-  --news-muted: #5f6b7d;
-  --news-line: rgba(9, 17, 31, 0.12);
-  --news-accent: #b80018;
-  --news-blue: #0d3b66;
-  --news-gold: #d8aa48;
+  --news-bg: #f4efe4;
+  --news-surface: #fffdf7;
+  --news-panel: #f6f0e4;
+  --news-ink: #18212d;
+  --news-muted: #6f6758;
+  --news-line: rgba(24, 33, 45, 0.12);
+  --news-accent: #a12c2f;
+  --news-blue: #184c53;
+  --news-gold: #ba8d3f;
 }
 
 * {
@@ -26,11 +26,14 @@ html {
 
 body {
   margin: 0;
-  font-family: "Source Sans 3", "Segoe UI", sans-serif;
+  font-family: "Manrope", "Segoe UI", sans-serif;
   color: var(--news-ink);
   background:
-    radial-gradient(circle at top, rgba(13, 59, 102, 0.12), transparent 30%),
-    linear-gradient(180deg, #f8fbff 0%, #eef2f7 40%, #f4f6fa 100%);
+    radial-gradient(circle at top, rgba(24, 76, 83, 0.12), transparent 28%),
+    linear-gradient(180deg, #fbf7ee 0%, #f4efe4 46%, #efe8d9 100%);
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 #root {
@@ -42,7 +45,16 @@ h2,
 h3,
 h4,
 .font-display {
-  font-family: "Libre Baskerville", Georgia, serif;
+  font-family: "Cormorant Garamond", Georgia, serif;
+  letter-spacing: -0.02em;
+}
+
+p,
+input,
+button,
+textarea,
+select {
+  letter-spacing: -0.01em;
 }
 
 a {
@@ -56,7 +68,7 @@ img {
 }
 
 ::selection {
-  background: rgba(184, 0, 24, 0.18);
+  background: rgba(161, 44, 47, 0.18);
 }
 
 .news-shell {
@@ -69,12 +81,22 @@ img {
   inset: 0;
   pointer-events: none;
   background:
-    linear-gradient(90deg, rgba(255, 255, 255, 0.45), transparent 18%, transparent 82%, rgba(255, 255, 255, 0.45)),
-    linear-gradient(180deg, transparent, rgba(9, 17, 31, 0.03));
+    linear-gradient(90deg, rgba(255, 250, 239, 0.66), transparent 18%, transparent 82%, rgba(255, 250, 239, 0.66)),
+    linear-gradient(180deg, transparent, rgba(24, 33, 45, 0.03));
 }
 
 .glass-panel {
   backdrop-filter: blur(16px);
+}
+
+.headline-balance {
+  text-wrap: balance;
+}
+
+.paper-panel {
+  background:
+    linear-gradient(180deg, rgba(255, 253, 247, 0.98), rgba(247, 239, 225, 0.96)),
+    radial-gradient(circle at top left, rgba(186, 141, 63, 0.08), transparent 34%);
 }
 
 .ticker-track {

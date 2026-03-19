@@ -6,6 +6,7 @@ import { fileURLToPath } from "url";
 import articleRoutes from "./routes/articleRoutes.js";
 import commentRoutes from "./routes/commentRoutes.js";
 import connectDB, { disconnectDB } from "./config/db.js";
+import headlineRoutes from "./routes/headlineRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 
 dotenv.config();
@@ -40,6 +41,7 @@ app.use("/api", cors(corsOptions));
 app.use("/api/users", userRoutes);
 app.use("/api/articles", articleRoutes);
 app.use("/api/comments", commentRoutes);
+app.use("/api/headlines", headlineRoutes);
 
 if (process.env.NODE_ENV === "production") {
   app.use(express.static(frontendDistPath));

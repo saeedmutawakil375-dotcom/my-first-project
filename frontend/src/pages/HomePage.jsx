@@ -19,9 +19,42 @@ const sections = [
 ];
 
 const spotlightSections = ["World", "Finance", "Sports", "Entertainment"];
+const videoDeskItems = [
+  {
+    title: "NBC News NOW | March 6",
+    source: "NBC News",
+    label: "Live desk replay",
+    videoId: "enKWyZH6dVI",
+    sourceUrl: "https://www.youtube.com/live/enKWyZH6dVI"
+  },
+  {
+    title: "NBC News NOW | March 5",
+    source: "NBC News",
+    label: "Breaking rundown",
+    videoId: "Pxo9gyxtjjA",
+    sourceUrl: "https://www.youtube.com/watch?v=Pxo9gyxtjjA"
+  },
+  {
+    title: "NBC News NOW | March 4",
+    source: "NBC News",
+    label: "Global briefing",
+    videoId: "eEqHfqza428",
+    sourceUrl: "https://www.youtube.com/watch?v=eEqHfqza428"
+  },
+  {
+    title: "NBC News NOW | March 2",
+    source: "NBC News",
+    label: "World update",
+    videoId: "RrR3Bn60J7I",
+    sourceUrl: "https://www.youtube.com/live/RrR3Bn60J7I"
+  }
+];
 
 const HomePage = () => {
   const [articles, setArticles] = useState([]);
+  const [wireHeadlines, setWireHeadlines] = useState([]);
+  const [wireMeta, setWireMeta] = useState(null);
+  const [selectedVideo, setSelectedVideo] = useState(videoDeskItems[0]);
   const [activeSection, setActiveSection] = useState("All");
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
@@ -54,6 +87,20 @@ const HomePage = () => {
     fetchArticles();
   }, [searchTerm]);
 
+  useEffect(() => {
+    const fetchWireHeadlines = async () => {
+      try {
+        const response = await api.get("/headlines");
+        setWireHeadlines(response.data.headlines || []);
+        setWireMeta(response.data);
+      } catch (_error) {
+        setWireHeadlines([]);
+      }
+    };
+
+    fetchWireHeadlines();
+  }, []);
+
   const visibleArticles = useMemo(
     () =>
       activeSection === "All"
@@ -65,7 +112,8 @@ const HomePage = () => {
   const leadStory = visibleArticles[0];
   const topStories = visibleArticles.slice(1, 4);
   const latestStories = visibleArticles.slice(1, 7);
-  const trendingStories = articles.slice(0, 5);
+  const trendingStories = wireHeadlines.length > 0 ? wireHeadlines.slice(0, 8) : articles.slice(0, 5);
+  const wireCards = wireHeadlines.slice(0, 4);
 
   const spotlightStories = spotlightSections
     .map((section) => articles.find((article) => article.category === section))
@@ -117,28 +165,46 @@ const HomePage = () => {
             </p>
             <div className="mt-5 overflow-hidden rounded-2xl border border-white/10 bg-black/15 px-4 py-3">
               <div className="ticker-track text-sm font-semibold uppercase tracking-[0.22em] text-white/82">
-                {[...trendingStories, ...trendingStories].map((article, index) => (
-                  <span key={`${article._id}-${index}`}>{article.title}</span>
+                {[...trendingStories, ...trendingStories].map((story, index) => (
+                  <span key={`${story.link || story._id}-${index}`}>{story.title}</span>
                 ))}
               </div>
             </div>
 
             <div className="mt-8 space-y-4">
-              {trendingStories.slice(0, 3).map((article, index) => (
-                <Link
-                  key={article._id}
-                  to={createArticlePath(article)}
-                  className="block rounded-2xl border border-white/10 bg-white/5 p-5 transition hover:bg-white/10"
-                >
-                  <p className="text-[0.68rem] font-bold uppercase tracking-[0.32em] text-[#d8aa48]">
-                    Trend {index + 1}
-                  </p>
-                  <h2 className="mt-3 font-display text-2xl leading-snug text-white">
-                    {article.title}
-                  </h2>
-                  <p className="mt-3 text-base leading-7 text-white/72">{article.excerpt}</p>
-                </Link>
-              ))}
+              {trendingStories.slice(0, 3).map((story, index) =>
+                story.link ? (
+                  <a
+                    key={story.link}
+                    href={story.link}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="block rounded-2xl border border-white/10 bg-white/5 p-5 transition hover:bg-white/10"
+                  >
+                    <p className="text-[0.68rem] font-bold uppercase tracking-[0.32em] text-[#d8aa48]">
+                      {story.section || "Wire"} | {story.source}
+                    </p>
+                    <h2 className="mt-3 font-display text-2xl leading-snug text-white">
+                      {story.title}
+                    </h2>
+                    <p className="mt-3 text-base leading-7 text-white/72">Open original report</p>
+                  </a>
+                ) : (
+                  <Link
+                    key={story._id}
+                    to={createArticlePath(story)}
+                    className="block rounded-2xl border border-white/10 bg-white/5 p-5 transition hover:bg-white/10"
+                  >
+                    <p className="text-[0.68rem] font-bold uppercase tracking-[0.32em] text-[#d8aa48]">
+                      Trend {index + 1}
+                    </p>
+                    <h2 className="mt-3 font-display text-2xl leading-snug text-white">
+                      {story.title}
+                    </h2>
+                    <p className="mt-3 text-base leading-7 text-white/72">{story.excerpt}</p>
+                  </Link>
+                )
+              )}
             </div>
           </div>
         </div>
@@ -204,6 +270,162 @@ const HomePage = () => {
               </Link>
             )
           )}
+        </div>
+      </section>
+
+      <section className="grid gap-6 xl:grid-cols-[1.05fr_0.95fr]">
+        <div className="animate-fade-up rounded-[2rem] border border-slate-200 bg-[#07111f] p-6 text-white shadow-[0_20px_55px_rgba(15,23,42,0.18)] sm:p-8">
+          <p className="text-[0.72rem] font-bold uppercase tracking-[0.34em] text-[#d8aa48]">
+            Wire Monitor
+          </p>
+          <h2 className="headline-balance mt-3 font-display text-3xl leading-tight sm:text-4xl">
+            Live breaking headlines from official newswire feeds.
+          </h2>
+          <p className="mt-4 max-w-3xl text-base leading-7 text-white/72">
+            The breaking line now pulls directly from live RSS sources instead of placeholder
+            content, giving the front page a more current newsroom feel.
+          </p>
+          <div className="mt-6 rounded-[1.5rem] border border-white/10 bg-white/5 p-5">
+            <p className="text-[0.72rem] font-bold uppercase tracking-[0.28em] text-white/56">
+              Source attribution
+            </p>
+            <p className="mt-3 text-lg leading-8 text-white">
+              {wireMeta?.attribution?.source || "Live wire service"}
+            </p>
+            <p className="mt-3 text-sm leading-7 text-white/68">
+              {wireMeta?.attribution?.note ||
+                "Showing the latest available headlines from trusted external sources."}
+            </p>
+            {wireMeta?.updatedAt ? (
+              <p className="mt-4 text-xs font-bold uppercase tracking-[0.24em] text-white/44">
+                Updated {new Date(wireMeta.updatedAt).toLocaleString()}
+              </p>
+            ) : null}
+          </div>
+        </div>
+
+        <div className="space-y-5">
+          {wireCards.length > 0 ? (
+            wireCards.map((headline, index) => (
+              <a
+                key={headline.link}
+                href={headline.link}
+                target="_blank"
+                rel="noreferrer"
+                className="animate-slide-in block rounded-[1.75rem] border border-slate-200 bg-white p-6 shadow-[0_18px_45px_rgba(15,23,42,0.08)] transition hover:-translate-y-1 hover:shadow-[0_22px_45px_rgba(15,23,42,0.1)]"
+                style={{ animationDelay: `${0.08 * (index + 1)}s` }}
+              >
+                <div className="flex flex-wrap items-center gap-3 text-[0.72rem] font-bold uppercase tracking-[0.28em] text-slate-500">
+                  <span className="rounded-full bg-slate-100 px-3 py-1 text-slate-700">
+                    {headline.section}
+                  </span>
+                  <span>{headline.source}</span>
+                </div>
+                <h3 className="mt-4 font-display text-2xl leading-snug text-slate-950">
+                  {headline.title}
+                </h3>
+                <p className="mt-3 text-sm font-semibold uppercase tracking-[0.22em] text-[#b80018]">
+                  Open original coverage
+                </p>
+              </a>
+            ))
+          ) : (
+            <div className="rounded-[1.75rem] border border-slate-200 bg-white p-6 text-slate-600 shadow-[0_18px_45px_rgba(15,23,42,0.08)]">
+              Live wire headlines are temporarily unavailable.
+            </div>
+          )}
+        </div>
+      </section>
+
+      <section className="grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
+        <div className="animate-fade-up overflow-hidden rounded-[2rem] border border-slate-200 bg-[#07111f] text-white shadow-[0_20px_55px_rgba(15,23,42,0.18)]">
+          <div className="border-b border-white/10 px-6 py-5 sm:px-8">
+            <p className="text-[0.72rem] font-bold uppercase tracking-[0.34em] text-[#d8aa48]">
+              Video Desk
+            </p>
+            <h2 className="headline-balance mt-3 font-display text-3xl leading-tight sm:text-4xl">
+              Click a briefing and the player swaps instantly to that report.
+            </h2>
+            <p className="mt-3 max-w-3xl text-base leading-7 text-white/72">
+              Atlas Wire now uses a single embedded YouTube player, so when you choose another
+              clip the current one stops and the newly selected one takes over.
+            </p>
+          </div>
+
+          <div className="aspect-video bg-black">
+            <iframe
+              key={selectedVideo.videoId}
+              className="h-full w-full"
+              src={`https://www.youtube-nocookie.com/embed/${selectedVideo.videoId}?autoplay=1&rel=0&modestbranding=1`}
+              title={selectedVideo.title}
+              loading="lazy"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowFullScreen
+            />
+          </div>
+
+          <div className="border-t border-white/10 bg-white/[0.04] px-6 py-5 sm:px-8">
+            <div className="flex flex-wrap items-center gap-3 text-[0.72rem] font-bold uppercase tracking-[0.28em] text-white/62">
+              <span className="rounded-full bg-[#b80018] px-3 py-1 text-white">
+                {selectedVideo.label}
+              </span>
+              <span>{selectedVideo.source}</span>
+            </div>
+            <h3 className="mt-4 font-display text-2xl text-white">{selectedVideo.title}</h3>
+            <a
+              href={selectedVideo.sourceUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="mt-4 inline-flex items-center gap-2 text-sm font-bold uppercase tracking-[0.24em] text-[#d8aa48]"
+            >
+              Open on YouTube
+              <span aria-hidden="true">View</span>
+            </a>
+          </div>
+        </div>
+
+        <div className="space-y-4">
+          {videoDeskItems.map((item, index) => {
+            const isActive = item.videoId === selectedVideo.videoId;
+
+            return (
+              <button
+                key={item.videoId}
+                type="button"
+                onClick={() => setSelectedVideo(item)}
+                className={`animate-slide-in flex w-full items-center gap-4 rounded-[1.5rem] border p-4 text-left shadow-[0_16px_35px_rgba(15,23,42,0.06)] transition ${
+                  isActive
+                    ? "border-[#b80018] bg-[#fff5f6] shadow-[0_18px_40px_rgba(184,0,24,0.12)]"
+                    : "border-slate-200 bg-white hover:-translate-y-1 hover:shadow-[0_18px_40px_rgba(15,23,42,0.08)]"
+                }`}
+                style={{ animationDelay: `${0.06 * (index + 1)}s` }}
+              >
+                <div className="relative h-24 w-36 shrink-0 overflow-hidden rounded-[1rem] bg-slate-200">
+                  <img
+                    src={`https://i.ytimg.com/vi/${item.videoId}/hqdefault.jpg`}
+                    alt={item.title}
+                    className="h-full w-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent" />
+                  <span className="absolute bottom-2 left-2 rounded-full bg-white/90 px-2 py-1 text-[0.6rem] font-bold uppercase tracking-[0.24em] text-slate-950">
+                    Play
+                  </span>
+                </div>
+
+                <div className="min-w-0 flex-1">
+                  <p className="text-[0.7rem] font-bold uppercase tracking-[0.28em] text-[#b80018]">
+                    {item.label}
+                  </p>
+                  <h3 className="mt-2 font-display text-2xl leading-snug text-slate-950">
+                    {item.title}
+                  </h3>
+                  <p className="mt-2 text-sm font-semibold uppercase tracking-[0.22em] text-slate-500">
+                    {item.source}
+                  </p>
+                </div>
+              </button>
+            );
+          })}
         </div>
       </section>
 
@@ -358,18 +580,35 @@ const HomePage = () => {
                 </p>
                 <div className="mt-5 space-y-4">
                   {trendingStories.map((article, index) => (
-                    <Link
-                      key={article._id}
-                      to={createArticlePath(article)}
-                      className="block border-b border-white/10 pb-4 last:border-b-0 last:pb-0"
-                    >
-                      <p className="text-[0.7rem] font-bold uppercase tracking-[0.28em] text-white/56">
-                        {String(index + 1).padStart(2, "0")} | {article.category}
-                      </p>
-                      <h3 className="mt-2 text-xl font-semibold leading-8 text-white">
-                        {article.title}
-                      </h3>
-                    </Link>
+                    article.link ? (
+                      <a
+                        key={article.link}
+                        href={article.link}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="block border-b border-white/10 pb-4 last:border-b-0 last:pb-0"
+                      >
+                        <p className="text-[0.7rem] font-bold uppercase tracking-[0.28em] text-white/56">
+                          {String(index + 1).padStart(2, "0")} | {article.section}
+                        </p>
+                        <h3 className="mt-2 text-xl font-semibold leading-8 text-white">
+                          {article.title}
+                        </h3>
+                      </a>
+                    ) : (
+                      <Link
+                        key={article._id}
+                        to={createArticlePath(article)}
+                        className="block border-b border-white/10 pb-4 last:border-b-0 last:pb-0"
+                      >
+                        <p className="text-[0.7rem] font-bold uppercase tracking-[0.28em] text-white/56">
+                          {String(index + 1).padStart(2, "0")} | {article.category}
+                        </p>
+                        <h3 className="mt-2 text-xl font-semibold leading-8 text-white">
+                          {article.title}
+                        </h3>
+                      </Link>
+                    )
                   ))}
                 </div>
               </div>
