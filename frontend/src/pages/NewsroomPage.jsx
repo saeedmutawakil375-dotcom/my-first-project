@@ -3,12 +3,21 @@ import { useNavigate } from "react-router-dom";
 import api from "../api";
 import { useAuth } from "../context/AuthContext";
 
-const categories = ["World", "Technology", "Business", "Culture", "Opinion", "Community"];
+const categories = [
+  "World",
+  "Technology",
+  "Business",
+  "Finance",
+  "Sports",
+  "Entertainment",
+  "Health",
+  "Science"
+];
 
 const NewsroomPage = () => {
   const { user, updateProfile } = useAuth();
   const [formData, setFormData] = useState({
-    category: "Technology",
+    category: "World",
     title: "",
     excerpt: "",
     featuredImage: "",
@@ -79,11 +88,11 @@ const NewsroomPage = () => {
       const response = await api.post("/articles", formData);
       setMessage(
         formData.status === "published"
-          ? "Article published successfully."
-          : "Draft saved to your newsroom."
+          ? "Report published successfully."
+          : "Draft saved to your world desk."
       );
       setFormData({
-        category: "Technology",
+        category: "World",
         title: "",
         excerpt: "",
         featuredImage: "",
@@ -93,7 +102,7 @@ const NewsroomPage = () => {
       setNewsroomSearch("");
       navigate(`/articles/${response.data._id}`);
     } catch (err) {
-      setError(err.response?.data?.message || "Unable to publish your article");
+      setError(err.response?.data?.message || "Unable to publish your report");
     } finally {
       setLoading(false);
     }
@@ -120,38 +129,64 @@ const NewsroomPage = () => {
   };
 
   return (
-    <div className="grid gap-8 lg:grid-cols-[0.85fr_1.15fr]">
-      <div className="space-y-8">
-        <section className="border border-black/10 bg-black p-8 text-white">
-          <p className="text-sm font-semibold uppercase tracking-[0.35em] text-white/65">
-            Newsroom Access
-          </p>
-          <h1 className="mt-4 font-display text-4xl leading-tight">Welcome back, {user?.name}</h1>
-          <p className="mt-4 text-lg leading-8 text-white/75">
-            Draft a headline, file a feature, and publish directly to the front page.
-          </p>
-          <div className="mt-8 space-y-4 border-t border-white/15 pt-6 text-sm uppercase tracking-[0.2em] text-white/60">
-            <p>Section: {formData.category}</p>
-            <p>Status: {formData.status === "published" ? "Publish on submit" : "Save as draft"}</p>
-            <p>Output: Feature package + commentary</p>
-            <p>Byline: {user?.bio || "Add a strong author bio in your profile."}</p>
+    <div className="space-y-8">
+      <section className="animate-fade-up overflow-hidden rounded-[2rem] border border-slate-200 bg-[#07111f] text-white shadow-[0_24px_60px_rgba(15,23,42,0.16)]">
+        <div className="grid gap-0 lg:grid-cols-[1.1fr_0.9fr]">
+          <div className="bg-[radial-gradient(circle_at_top,_rgba(216,170,72,0.18),_transparent_35%),linear-gradient(160deg,#07111f_0%,#0d223d_42%,#0d3b66_100%)] p-8 sm:p-10">
+            <p className="text-[0.72rem] font-bold uppercase tracking-[0.38em] text-white/60">
+              Newsroom Console
+            </p>
+            <h1 className="mt-5 font-display text-4xl leading-tight sm:text-5xl">
+              Welcome back, {user?.name}
+            </h1>
+            <p className="mt-5 max-w-2xl text-lg leading-8 text-white/74">
+              File world reports, market analysis, sports coverage, entertainment briefs,
+              and science features from a single professional publishing desk.
+            </p>
           </div>
-        </section>
 
-        <section className="border border-black/10 bg-[#faf6ef] p-8">
-          <h2 className="font-display text-3xl text-black">Contributor Profile</h2>
-          <p className="mt-3 text-lg leading-7 text-black/65">
-            Update your byline details so every article carries a sharper editorial identity.
+          <div className="grid gap-4 bg-white p-6 text-slate-950 sm:grid-cols-2 sm:p-8">
+            <div className="rounded-[1.5rem] border border-slate-200 bg-slate-50 p-5">
+              <p className="text-[0.72rem] font-bold uppercase tracking-[0.28em] text-slate-500">
+                Active desk
+              </p>
+              <p className="mt-3 text-3xl font-bold text-slate-950">{formData.category}</p>
+            </div>
+            <div className="rounded-[1.5rem] border border-slate-200 bg-slate-50 p-5">
+              <p className="text-[0.72rem] font-bold uppercase tracking-[0.28em] text-slate-500">
+                Workflow
+              </p>
+              <p className="mt-3 text-3xl font-bold text-slate-950">
+                {formData.status === "published" ? "Live" : "Draft"}
+              </p>
+            </div>
+            <div className="rounded-[1.5rem] border border-slate-200 bg-slate-50 p-5 sm:col-span-2">
+              <p className="text-[0.72rem] font-bold uppercase tracking-[0.28em] text-slate-500">
+                Byline
+              </p>
+              <p className="mt-3 text-lg leading-7 text-slate-600">
+                {user?.bio || "Add a sharp correspondent bio in your profile."}
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div className="grid gap-8 xl:grid-cols-[0.8fr_1.2fr]">
+        <section className="animate-fade-up rounded-[2rem] border border-slate-200 bg-white p-6 shadow-[0_18px_45px_rgba(15,23,42,0.08)] sm:p-8">
+          <h2 className="font-display text-3xl text-slate-950">Correspondent Profile</h2>
+          <p className="mt-3 text-lg leading-8 text-slate-600">
+            Update your byline so every story reads like part of a trusted global network.
           </p>
 
           {profileMessage && (
-            <div className="mt-6 border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
+            <div className="mt-6 rounded-2xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
               {profileMessage}
             </div>
           )}
 
           {profileError && (
-            <div className="mt-6 border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            <div className="mt-6 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
               {profileError}
             </div>
           )}
@@ -160,7 +195,7 @@ const NewsroomPage = () => {
             <div>
               <label
                 htmlFor="profile-name"
-                className="mb-2 block text-sm font-medium uppercase tracking-[0.18em] text-black/60"
+                className="mb-2 block text-sm font-medium uppercase tracking-[0.18em] text-slate-500"
               >
                 Display Name
               </label>
@@ -170,16 +205,16 @@ const NewsroomPage = () => {
                 type="text"
                 value={profileForm.name}
                 onChange={handleProfileChange}
-                className="w-full border border-black/15 bg-white px-4 py-3 outline-none transition focus:border-[#b80018]"
+                className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none transition focus:border-[#b80018] focus:bg-white"
               />
             </div>
 
             <div>
               <label
                 htmlFor="profile-bio"
-                className="mb-2 block text-sm font-medium uppercase tracking-[0.18em] text-black/60"
+                className="mb-2 block text-sm font-medium uppercase tracking-[0.18em] text-slate-500"
               >
-                Author Bio
+                Correspondent Bio
               </label>
               <textarea
                 id="profile-bio"
@@ -187,14 +222,14 @@ const NewsroomPage = () => {
                 rows="4"
                 value={profileForm.bio}
                 onChange={handleProfileChange}
-                className="w-full border border-black/15 bg-white px-4 py-3 outline-none transition focus:border-[#b80018]"
+                className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none transition focus:border-[#b80018] focus:bg-white"
               />
             </div>
 
             <div>
               <label
                 htmlFor="profile-password"
-                className="mb-2 block text-sm font-medium uppercase tracking-[0.18em] text-black/60"
+                className="mb-2 block text-sm font-medium uppercase tracking-[0.18em] text-slate-500"
               >
                 New Password
               </label>
@@ -204,7 +239,7 @@ const NewsroomPage = () => {
                 type="password"
                 value={profileForm.password}
                 onChange={handleProfileChange}
-                className="w-full border border-black/15 bg-white px-4 py-3 outline-none transition focus:border-[#b80018]"
+                className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none transition focus:border-[#b80018] focus:bg-white"
                 placeholder="Leave blank to keep your current password"
               />
             </div>
@@ -212,219 +247,226 @@ const NewsroomPage = () => {
             <button
               type="submit"
               disabled={profileLoading}
-              className="border border-black bg-black px-6 py-3 font-semibold uppercase tracking-[0.2em] text-white transition hover:bg-[#b80018] disabled:cursor-not-allowed disabled:opacity-70"
+              className="rounded-full bg-[#07111f] px-6 py-3 text-sm font-bold uppercase tracking-[0.2em] text-white transition hover:bg-[#0d223d] disabled:cursor-not-allowed disabled:opacity-70"
             >
               {profileLoading ? "Saving..." : "Save Profile"}
             </button>
           </form>
         </section>
+
+        <section className="animate-fade-up rounded-[2rem] border border-slate-200 bg-white p-6 shadow-[0_18px_45px_rgba(15,23,42,0.08)] sm:p-8">
+          <h2 className="font-display text-3xl text-slate-950">File a New Report</h2>
+          <p className="mt-3 text-lg leading-8 text-slate-600">
+            Publish a polished headline package designed for a BBC-style front page and
+            sector desk.
+          </p>
+
+          {message && (
+            <div className="mt-6 rounded-2xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
+              {message}
+            </div>
+          )}
+
+          {error && (
+            <div className="mt-6 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+              {error}
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="mt-6 grid gap-5 md:grid-cols-2">
+            <div>
+              <label
+                htmlFor="status"
+                className="mb-2 block text-sm font-medium uppercase tracking-[0.18em] text-slate-500"
+              >
+                Workflow
+              </label>
+              <select
+                id="status"
+                name="status"
+                value={formData.status}
+                onChange={handleChange}
+                className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none transition focus:border-[#b80018] focus:bg-white"
+              >
+                <option value="draft">Save as Draft</option>
+                <option value="published">Publish Now</option>
+              </select>
+            </div>
+
+            <div>
+              <label
+                htmlFor="category"
+                className="mb-2 block text-sm font-medium uppercase tracking-[0.18em] text-slate-500"
+              >
+                Desk
+              </label>
+              <select
+                id="category"
+                name="category"
+                value={formData.category}
+                onChange={handleChange}
+                className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none transition focus:border-[#b80018] focus:bg-white"
+              >
+                {categories.map((category) => (
+                  <option key={category} value={category}>
+                    {category}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="md:col-span-2">
+              <label
+                htmlFor="title"
+                className="mb-2 block text-sm font-medium uppercase tracking-[0.18em] text-slate-500"
+              >
+                Headline
+              </label>
+              <input
+                id="title"
+                name="title"
+                type="text"
+                value={formData.title}
+                onChange={handleChange}
+                className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none transition focus:border-[#b80018] focus:bg-white"
+                placeholder="Markets brace for..."
+                required
+              />
+            </div>
+
+            <div className="md:col-span-2">
+              <label
+                htmlFor="excerpt"
+                className="mb-2 block text-sm font-medium uppercase tracking-[0.18em] text-slate-500"
+              >
+                Standfirst
+              </label>
+              <textarea
+                id="excerpt"
+                name="excerpt"
+                rows="3"
+                value={formData.excerpt}
+                onChange={handleChange}
+                className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none transition focus:border-[#b80018] focus:bg-white"
+                placeholder="A concise front-page summary that explains why the story matters now."
+                required
+              />
+            </div>
+
+            <div className="md:col-span-2">
+              <label
+                htmlFor="featuredImage"
+                className="mb-2 block text-sm font-medium uppercase tracking-[0.18em] text-slate-500"
+              >
+                Hero Image URL
+              </label>
+              <input
+                id="featuredImage"
+                name="featuredImage"
+                type="url"
+                value={formData.featuredImage}
+                onChange={handleChange}
+                className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none transition focus:border-[#b80018] focus:bg-white"
+                placeholder="https://images.unsplash.com/..."
+                required
+              />
+            </div>
+
+            <div className="md:col-span-2">
+              <label
+                htmlFor="description"
+                className="mb-2 block text-sm font-medium uppercase tracking-[0.18em] text-slate-500"
+              >
+                Story Body
+              </label>
+              <textarea
+                id="description"
+                name="description"
+                rows="8"
+                value={formData.description}
+                onChange={handleChange}
+                className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none transition focus:border-[#b80018] focus:bg-white"
+                placeholder="Write the full report, context, analysis, and the reason it matters to a global audience."
+                required
+              />
+            </div>
+
+            <div className="md:col-span-2">
+              <button
+                type="submit"
+                disabled={loading}
+                className="rounded-full bg-[#b80018] px-6 py-3 text-sm font-bold uppercase tracking-[0.22em] text-white shadow-[0_16px_30px_rgba(184,0,24,0.22)] transition hover:bg-[#d4112b] disabled:cursor-not-allowed disabled:opacity-70"
+              >
+                {loading
+                  ? formData.status === "published"
+                    ? "Publishing..."
+                    : "Saving..."
+                  : formData.status === "published"
+                    ? "Publish Report"
+                    : "Save Draft"}
+              </button>
+            </div>
+          </form>
+        </section>
       </div>
 
-      <section className="border border-black/10 bg-[#fbf8f2] p-8">
-        <h2 className="font-display text-3xl text-black">Publish a New Article</h2>
-        <p className="mt-3 text-lg leading-7 text-black/65">
-          Write a strong headline and a detailed body so the article feels ready for a news
-          homepage, feature column, or developing story slot.
-        </p>
-
-        {message && (
-          <div className="mt-6 border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
-            {message}
-          </div>
-        )}
-
-        {error && (
-          <div className="mt-6 border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-            {error}
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="mt-6 space-y-5">
-          <div>
-            <label
-              htmlFor="status"
-              className="mb-2 block text-sm font-medium uppercase tracking-[0.18em] text-black/60"
-            >
-              Workflow
-            </label>
-            <select
-              id="status"
-              name="status"
-              value={formData.status}
-              onChange={handleChange}
-              className="w-full border border-black/15 bg-white px-4 py-3 outline-none transition focus:border-[#b80018]"
-            >
-              <option value="draft">Save as Draft</option>
-              <option value="published">Publish Now</option>
-            </select>
-          </div>
-          <div>
-            <label
-              htmlFor="category"
-              className="mb-2 block text-sm font-medium uppercase tracking-[0.18em] text-black/60"
-            >
-              Section
-            </label>
-            <select
-              id="category"
-              name="category"
-              value={formData.category}
-              onChange={handleChange}
-              className="w-full border border-black/15 bg-white px-4 py-3 outline-none transition focus:border-[#b80018]"
-            >
-              {categories.map((category) => (
-                <option key={category} value={category}>
-                  {category}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <label
-              htmlFor="title"
-              className="mb-2 block text-sm font-medium uppercase tracking-[0.18em] text-black/60"
-            >
-              Headline
-            </label>
-            <input
-              id="title"
-              name="title"
-              type="text"
-              value={formData.title}
-              onChange={handleChange}
-              className="w-full border border-black/15 bg-white px-4 py-3 outline-none transition focus:border-[#b80018]"
-              placeholder="Inside the pressure reshaping independent tech careers"
-              required
-            />
-          </div>
-
-          <div>
-            <label
-              htmlFor="excerpt"
-              className="mb-2 block text-sm font-medium uppercase tracking-[0.18em] text-black/60"
-            >
-              Standfirst / Excerpt
-            </label>
-            <textarea
-              id="excerpt"
-              name="excerpt"
-              rows="3"
-              value={formData.excerpt}
-              onChange={handleChange}
-              className="w-full border border-black/15 bg-white px-4 py-3 outline-none transition focus:border-[#b80018]"
-              placeholder="A concise editorial summary that will appear on the front page and at the top of the article."
-              required
-            />
-          </div>
-
-          <div>
-            <label
-              htmlFor="featuredImage"
-              className="mb-2 block text-sm font-medium uppercase tracking-[0.18em] text-black/60"
-            >
-              Featured Image URL
-            </label>
-            <input
-              id="featuredImage"
-              name="featuredImage"
-              type="url"
-              value={formData.featuredImage}
-              onChange={handleChange}
-              className="w-full border border-black/15 bg-white px-4 py-3 outline-none transition focus:border-[#b80018]"
-              placeholder="https://images.unsplash.com/..."
-              required
-            />
-          </div>
-
-          <div>
-            <label
-              htmlFor="description"
-              className="mb-2 block text-sm font-medium uppercase tracking-[0.18em] text-black/60"
-            >
-              Article Body
-            </label>
-            <textarea
-              id="description"
-              name="description"
-              rows="6"
-              value={formData.description}
-              onChange={handleChange}
-              className="w-full border border-black/15 bg-white px-4 py-3 outline-none transition focus:border-[#b80018]"
-              placeholder="Write the story, include the context, and invite readers to weigh in with their own perspectives."
-              required
-            />
-          </div>
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="border border-[#b80018] bg-[#b80018] px-6 py-3 font-semibold uppercase tracking-[0.2em] text-white transition hover:bg-[#8f0012] disabled:cursor-not-allowed disabled:opacity-70"
-          >
-            {loading
-              ? formData.status === "published"
-                ? "Publishing..."
-                : "Saving..."
-              : formData.status === "published"
-                ? "Publish Article"
-                : "Save Draft"}
-          </button>
-        </form>
-      </section>
-
-      <section className="border border-black/10 bg-[#faf6ef] p-8 lg:col-span-2">
+      <section className="animate-fade-up rounded-[2rem] border border-slate-200 bg-white p-6 shadow-[0_18px_45px_rgba(15,23,42,0.08)] sm:p-8">
         <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div>
-            <h2 className="font-display text-3xl text-black">Your Newsroom Queue</h2>
-            <p className="mt-2 text-lg leading-7 text-black/65">
-              Review your drafts and published articles in one place.
+            <h2 className="font-display text-3xl text-slate-950">Your Coverage Queue</h2>
+            <p className="mt-2 text-lg leading-7 text-slate-600">
+              Review drafts and live reports across your desks.
             </p>
           </div>
+
           <div className="w-full max-w-md">
             <label
               htmlFor="newsroom-search"
-              className="mb-2 block text-sm font-medium uppercase tracking-[0.18em] text-black/60"
+              className="mb-2 block text-sm font-medium uppercase tracking-[0.18em] text-slate-500"
             >
-              Search your articles
+              Search your reports
             </label>
             <input
               id="newsroom-search"
               type="search"
               value={newsroomSearch}
               onChange={(event) => setNewsroomSearch(event.target.value)}
-              className="w-full border border-black/15 bg-white px-4 py-3 outline-none transition focus:border-[#b80018]"
-              placeholder="Search your headlines and drafts..."
+              className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none transition focus:border-[#b80018] focus:bg-white"
+              placeholder="Search drafts, live updates, and desk coverage..."
             />
           </div>
         </div>
 
         <div className="mt-6 grid gap-4">
           {myArticles.length === 0 ? (
-            <div className="border border-dashed border-black/20 bg-white p-6 text-black/60">
-              No articles found in your newsroom yet.
+            <div className="rounded-[1.5rem] border border-dashed border-slate-300 bg-slate-50 p-6 text-slate-500">
+              No reports found in your queue yet.
             </div>
           ) : (
             myArticles.map((article) => (
               <article
                 key={article._id}
-                className="grid gap-4 border border-black/10 bg-white p-5 md:grid-cols-[1fr_auto]"
+                className="grid gap-4 rounded-[1.75rem] border border-slate-200 bg-slate-50 p-5 md:grid-cols-[1fr_auto]"
               >
                 <div>
-                  <div className="flex flex-wrap items-center gap-3 text-xs font-semibold uppercase tracking-[0.24em] text-black/55">
-                    <span className="bg-[#b80018] px-2 py-1 text-white">{article.category}</span>
-                    <span>{article.status === "published" ? "published" : "draft"}</span>
+                  <div className="flex flex-wrap items-center gap-3 text-[0.72rem] font-bold uppercase tracking-[0.24em] text-slate-500">
+                    <span className="rounded-full bg-[#b80018] px-3 py-1 text-white">
+                      {article.category}
+                    </span>
+                    <span>{article.status === "published" ? "live" : "draft"}</span>
                     <span>{new Date(article.updatedAt).toLocaleDateString()}</span>
                   </div>
-                  <h3 className="mt-3 font-display text-2xl text-black">{article.title}</h3>
-                  <p className="mt-3 max-w-3xl text-base leading-7 text-black/70">
+                  <h3 className="mt-3 font-display text-2xl text-slate-950">{article.title}</h3>
+                  <p className="mt-3 max-w-3xl text-base leading-7 text-slate-600">
                     {article.excerpt}
                   </p>
                 </div>
+
                 <div className="flex items-center">
                   <button
                     type="button"
                     onClick={() => navigate(`/articles/${article._id}`)}
-                    className="border border-black px-4 py-2 text-sm font-semibold uppercase tracking-[0.18em] text-black transition hover:border-[#b80018] hover:text-[#b80018]"
+                    className="rounded-full border border-slate-300 px-4 py-2 text-sm font-bold uppercase tracking-[0.18em] text-slate-800 transition hover:border-[#b80018] hover:text-[#b80018]"
                   >
                     Open
                   </button>

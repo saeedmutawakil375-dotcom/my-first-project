@@ -6,7 +6,19 @@ const articleSchema = new mongoose.Schema(
       type: String,
       required: true,
       trim: true,
-      enum: ["World", "Technology", "Business", "Culture", "Opinion", "Community"]
+      enum: [
+        "World",
+        "Technology",
+        "Business",
+        "Finance",
+        "Sports",
+        "Entertainment",
+        "Health",
+        "Science",
+        "Culture",
+        "Opinion",
+        "Community"
+      ]
     },
     title: {
       type: String,

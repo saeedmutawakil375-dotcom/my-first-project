@@ -33,24 +33,26 @@ const RegisterPage = () => {
   };
 
   return (
-    <div className="grid gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-stretch">
-      <section className="border border-black/10 bg-[#b80018] p-8 text-white sm:p-10">
-        <p className="text-xs font-semibold uppercase tracking-[0.4em] text-white/70">
-          Join the Publication
-        </p>
-        <h2 className="mt-5 font-display text-4xl leading-tight">
-          Create your contributor account and publish to the front page.
-        </h2>
-        <p className="mt-5 text-lg leading-8 text-white/85">
-          Register once, then use the newsroom to post fresh reporting, feature essays, and
-          discussion-starting articles with community feedback.
-        </p>
+    <div className="grid gap-8 xl:grid-cols-[0.85fr_1.15fr] xl:items-stretch">
+      <section className="animate-fade-up overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-[0_24px_60px_rgba(15,23,42,0.08)]">
+        <div className="h-full bg-[radial-gradient(circle_at_top,_rgba(184,0,24,0.12),_transparent_40%),linear-gradient(180deg,#ffffff_0%,#f8fafc_100%)] p-8 sm:p-10">
+          <p className="text-[0.72rem] font-bold uppercase tracking-[0.4em] text-[#b80018]">
+            Join the Publication
+          </p>
+          <h2 className="mt-5 font-display text-4xl leading-tight text-slate-950 sm:text-5xl">
+            Build your contributor profile and publish across every major sector.
+          </h2>
+          <p className="mt-5 max-w-2xl text-lg leading-8 text-slate-600">
+            Register once, then report on world affairs, markets, entertainment, sport,
+            science, health, and the big trends shaping the global agenda.
+          </p>
+        </div>
       </section>
 
       <div className="space-y-6">
         <AuthForm
           title="Create Account"
-          subtitle="Get newsroom access and start publishing long-form articles with ranked reader responses."
+          subtitle="Get newsroom access and start publishing polished reports for a global audience."
           formData={formData}
           onChange={handleChange}
           onSubmit={handleSubmit}
@@ -58,9 +60,9 @@ const RegisterPage = () => {
           loading={loading}
           error={error}
         />
-        <p className="text-center text-sm uppercase tracking-[0.18em] text-black/55">
+        <p className="text-center text-sm uppercase tracking-[0.18em] text-slate-500">
           Already have an account?{" "}
-          <Link to="/login" className="font-semibold text-[#b80018]">
+          <Link to="/login" className="font-bold text-[#b80018]">
             Sign in
           </Link>
         </p>
