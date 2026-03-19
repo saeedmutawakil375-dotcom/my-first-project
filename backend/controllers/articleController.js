@@ -58,7 +58,7 @@ const findArticleBySlugOrId = async (slugOrId) => {
 
 const createArticle = async (req, res) => {
   try {
-    const { category, title, excerpt, description, featuredImage, status } = req.body;
+    const { category, title, excerpt, description, featuredImage, youtubeUrl, status } = req.body;
 
     if (!category || !title || !excerpt || !description || !featuredImage) {
       return res.status(400).json({
@@ -73,6 +73,7 @@ const createArticle = async (req, res) => {
       excerpt,
       description,
       featuredImage,
+      youtubeUrl: youtubeUrl?.trim() || "",
       status: status === "published" ? "published" : "draft",
       author: req.user._id
     });
@@ -87,7 +88,7 @@ const createArticle = async (req, res) => {
 
 const updateArticle = async (req, res) => {
   try {
-    const { category, title, excerpt, description, featuredImage, status } = req.body;
+    const { category, title, excerpt, description, featuredImage, youtubeUrl, status } = req.body;
 
     if (!category || !title || !excerpt || !description || !featuredImage) {
       return res.status(400).json({
@@ -111,6 +112,7 @@ const updateArticle = async (req, res) => {
     article.excerpt = excerpt;
     article.description = description;
     article.featuredImage = featuredImage;
+    article.youtubeUrl = youtubeUrl?.trim() || "";
     article.status = status === "published" ? "published" : "draft";
 
     await article.save();

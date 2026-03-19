@@ -25,6 +25,7 @@ const NewsroomPage = () => {
     title: "",
     excerpt: "",
     featuredImage: "",
+    youtubeUrl: "",
     description: "",
     status: "draft"
   });
@@ -147,6 +148,7 @@ const NewsroomPage = () => {
         title: "",
         excerpt: "",
         featuredImage: "",
+        youtubeUrl: "",
         description: "",
         status: "draft"
       });
@@ -453,6 +455,24 @@ const NewsroomPage = () => {
                 className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none transition focus:border-[#b80018] focus:bg-white"
                 placeholder="https://images.unsplash.com/..."
                 required
+              />
+            </div>
+
+            <div className="md:col-span-2">
+              <label
+                htmlFor="youtubeUrl"
+                className="mb-2 block text-sm font-medium uppercase tracking-[0.18em] text-slate-500"
+              >
+                YouTube Video URL
+              </label>
+              <input
+                id="youtubeUrl"
+                name="youtubeUrl"
+                type="url"
+                value={formData.youtubeUrl}
+                onChange={handleChange}
+                className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none transition focus:border-[#b80018] focus:bg-white"
+                placeholder="https://www.youtube.com/watch?v=..."
               />
             </div>
 

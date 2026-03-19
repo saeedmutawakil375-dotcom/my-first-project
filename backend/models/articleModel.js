@@ -47,6 +47,11 @@ const articleSchema = new mongoose.Schema(
       required: true,
       trim: true
     },
+    youtubeUrl: {
+      type: String,
+      trim: true,
+      default: ""
+    },
     status: {
       type: String,
       required: true,

@@ -24,6 +24,40 @@ const estimateReadMinutes = (text = "") => {
   return Math.max(2, Math.ceil(words / 180));
 };
 
+const getYouTubeEmbedUrl = (url = "") => {
+  if (!url) {
+    return "";
+  }
+
+  try {
+    const parsedUrl = new URL(url);
+    const host = parsedUrl.hostname.replace("www.", "");
+
+    if (host === "youtu.be") {
+      const videoId = parsedUrl.pathname.replace("/", "");
+      return videoId
+        ? `https://www.youtube-nocookie.com/embed/${videoId}?rel=0&modestbranding=1`
+        : "";
+    }
+
+    if (host.includes("youtube.com")) {
+      const videoId = parsedUrl.searchParams.get("v");
+      if (videoId) {
+        return `https://www.youtube-nocookie.com/embed/${videoId}?rel=0&modestbranding=1`;
+      }
+
+      const pathMatch = parsedUrl.pathname.match(/\/live\/([^/]+)/);
+      if (pathMatch?.[1]) {
+        return `https://www.youtube-nocookie.com/embed/${pathMatch[1]}?rel=0&modestbranding=1`;
+      }
+    }
+  } catch (_error) {
+    return "";
+  }
+
+  return "";
+};
+
 const ArticleDetailsPage = () => {
   const { slugOrId } = useParams();
   const { user } = useAuth();
@@ -56,6 +90,7 @@ const ArticleDetailsPage = () => {
         title: response.data.article.title,
         excerpt: response.data.article.excerpt,
         featuredImage: response.data.article.featuredImage,
+        youtubeUrl: response.data.article.youtubeUrl || "",
         description: response.data.article.description,
         status: response.data.article.status
       });
@@ -243,6 +278,7 @@ const ArticleDetailsPage = () => {
 
   const isArticleOwner = user?._id === article?.author?._id;
   const readMinutes = estimateReadMinutes(article?.description);
+  const embeddedVideoUrl = getYouTubeEmbedUrl(article?.youtubeUrl);
 
   if (loading) {
     return (
@@ -324,6 +360,27 @@ const ArticleDetailsPage = () => {
               {article.description}
             </div>
           </section>
+
+          {embeddedVideoUrl ? (
+            <section className="animate-fade-up overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-[0_18px_45px_rgba(15,23,42,0.08)]">
+              <div className="border-b border-slate-200 px-6 py-5 sm:px-8">
+                <p className="text-[0.72rem] font-bold uppercase tracking-[0.3em] text-[#b80018]">
+                  Related Video
+                </p>
+                <h2 className="mt-3 font-display text-3xl text-slate-950">Watch from Kasoa</h2>
+              </div>
+              <div className="aspect-video bg-black">
+                <iframe
+                  className="h-full w-full"
+                  src={embeddedVideoUrl}
+                  title={`${article.title} video`}
+                  loading="lazy"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                />
+              </div>
+            </section>
+          ) : null}
 
           {editingArticle && articleForm && (
             <section className="animate-fade-up rounded-[2rem] border border-slate-200 bg-white p-6 shadow-[0_18px_45px_rgba(15,23,42,0.08)] sm:p-8">
@@ -416,6 +473,23 @@ const ArticleDetailsPage = () => {
                     value={articleForm.featuredImage}
                     onChange={handleArticleChange}
                     className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none transition focus:border-[#b80018] focus:bg-white"
+                  />
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="edit-youtube"
+                    className="mb-2 block text-sm font-medium uppercase tracking-[0.18em] text-slate-500"
+                  >
+                    YouTube Video URL
+                  </label>
+                  <input
+                    id="edit-youtube"
+                    name="youtubeUrl"
+                    value={articleForm.youtubeUrl}
+                    onChange={handleArticleChange}
+                    className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none transition focus:border-[#b80018] focus:bg-white"
+                    placeholder="https://www.youtube.com/watch?v=..."
                   />
                 </div>
 
