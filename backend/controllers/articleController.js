@@ -1,5 +1,60 @@
 import Article from "../models/articleModel.js";
 import Comment from "../models/commentModel.js";
+import mongoose from "mongoose";
+
+const slugify = (value = "") =>
+  value
+    .toLowerCase()
+    .normalize("NFKD")
+    .replace(/[^\w\s-]/g, "")
+    .trim()
+    .replace(/[-\s]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 80) || "story";
+
+const generateUniqueSlug = async (title, excludeId) => {
+  const baseSlug = slugify(title);
+  let slug = baseSlug;
+  let counter = 1;
+
+  while (true) {
+    const existingArticle = await Article.findOne({
+      slug,
+      ...(excludeId ? { _id: { $ne: excludeId } } : {})
+    }).select("_id");
+
+    if (!existingArticle) {
+      return slug;
+    }
+
+    counter += 1;
+    slug = `${baseSlug}-${counter}`;
+  }
+};
+
+const ensureArticleSlug = async (article) => {
+  if (article.slug) {
+    return article;
+  }
+
+  article.slug = await generateUniqueSlug(article.title, article._id);
+  await article.save();
+  return article;
+};
+
+const findArticleBySlugOrId = async (slugOrId) => {
+  const articleBySlug = await Article.findOne({ slug: slugOrId });
+
+  if (articleBySlug) {
+    return articleBySlug;
+  }
+
+  if (mongoose.isValidObjectId(slugOrId)) {
+    return Article.findById(slugOrId);
+  }
+
+  return null;
+};
 
 const createArticle = async (req, res) => {
   try {
@@ -14,6 +69,7 @@ const createArticle = async (req, res) => {
     const article = await Article.create({
       category,
       title,
+      slug: await generateUniqueSlug(title),
       excerpt,
       description,
       featuredImage,
@@ -51,6 +107,7 @@ const updateArticle = async (req, res) => {
 
     article.category = category;
     article.title = title;
+    article.slug = await generateUniqueSlug(title, article._id);
     article.excerpt = excerpt;
     article.description = description;
     article.featuredImage = featuredImage;
@@ -127,6 +184,8 @@ const getArticles = async (req, res) => {
       .populate("author", "name email bio")
       .sort({ createdAt: -1 });
 
+    await Promise.all(articles.map((article) => ensureArticleSlug(article)));
+
     return res.status(200).json(articles);
   } catch (error) {
     return res.status(500).json({ message: "Server error while fetching articles" });
@@ -135,11 +194,14 @@ const getArticles = async (req, res) => {
 
 const getArticleById = async (req, res) => {
   try {
-    const article = await Article.findById(req.params.id).populate("author", "name email bio");
+    const article = await findArticleBySlugOrId(req.params.id);
 
     if (!article) {
       return res.status(404).json({ message: "Article not found" });
     }
+
+    await ensureArticleSlug(article);
+    await article.populate("author", "name email bio");
 
     if (
       article.status !== "published" &&
@@ -174,6 +236,8 @@ const getMyArticles = async (req, res) => {
     const articles = await Article.find(filter)
       .populate("author", "name email bio")
       .sort({ updatedAt: -1 });
+
+    await Promise.all(articles.map((article) => ensureArticleSlug(article)));
 
     return res.status(200).json(articles);
   } catch (error) {

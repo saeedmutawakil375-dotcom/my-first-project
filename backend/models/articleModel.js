@@ -25,6 +25,12 @@ const articleSchema = new mongoose.Schema(
       required: true,
       trim: true
     },
+    slug: {
+      type: String,
+      trim: true,
+      unique: true,
+      sparse: true
+    },
     excerpt: {
       type: String,
       required: true,

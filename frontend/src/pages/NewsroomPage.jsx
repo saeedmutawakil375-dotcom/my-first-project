@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import api from "../api";
 import { useAuth } from "../context/AuthContext";
 import usePageMeta from "../hooks/usePageMeta";
+import createArticlePath from "../utils/articlePath";
 
 const categories = [
   "World",
@@ -107,7 +108,7 @@ const NewsroomPage = () => {
         status: "draft"
       });
       setNewsroomSearch("");
-      navigate(`/articles/${response.data._id}`);
+      navigate(createArticlePath(response.data));
     } catch (err) {
       setError(err.response?.data?.message || "Unable to publish your report");
     } finally {
@@ -472,7 +473,7 @@ const NewsroomPage = () => {
                 <div className="flex items-center">
                   <button
                     type="button"
-                    onClick={() => navigate(`/articles/${article._id}`)}
+                    onClick={() => navigate(createArticlePath(article))}
                     className="rounded-full border border-slate-300 px-4 py-2 text-sm font-bold uppercase tracking-[0.18em] text-slate-800 transition hover:border-[#b80018] hover:text-[#b80018]"
                   >
                     Open

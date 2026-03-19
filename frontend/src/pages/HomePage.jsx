@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import api from "../api";
 import ArticleCard from "../components/ArticleCard";
 import usePageMeta from "../hooks/usePageMeta";
+import createArticlePath from "../utils/articlePath";
 
 const sections = [
   "All",
@@ -125,7 +126,7 @@ const HomePage = () => {
               {trendingStories.slice(0, 3).map((article, index) => (
                 <Link
                   key={article._id}
-                  to={`/articles/${article._id}`}
+                  to={createArticlePath(article)}
                   className="block rounded-2xl border border-white/10 bg-white/5 p-5 transition hover:bg-white/10"
                 >
                   <p className="text-[0.68rem] font-bold uppercase tracking-[0.32em] text-[#d8aa48]">
@@ -229,7 +230,7 @@ const HomePage = () => {
                       {leadStory.excerpt}
                     </p>
                     <Link
-                      to={`/articles/${leadStory._id}`}
+                      to={createArticlePath(leadStory)}
                       className="mt-6 inline-flex items-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-bold uppercase tracking-[0.2em] text-[#07111f]"
                     >
                       Open full report
@@ -256,7 +257,7 @@ const HomePage = () => {
                 {topStories.map((story, index) => (
                   <Link
                     key={story._id}
-                    to={`/articles/${story._id}`}
+                    to={createArticlePath(story)}
                     className="animate-slide-in block rounded-[1.75rem] border border-slate-200 bg-white p-6 shadow-[0_16px_35px_rgba(15,23,42,0.06)] transition hover:-translate-y-1 hover:shadow-[0_22px_45px_rgba(15,23,42,0.1)]"
                     style={{ animationDelay: `${0.08 * (index + 1)}s` }}
                   >
@@ -286,7 +287,7 @@ const HomePage = () => {
                   {spotlightStories.map((article, index) => (
                     <Link
                       key={article._id}
-                      to={`/articles/${article._id}`}
+                      to={createArticlePath(article)}
                       className="animate-fade-up overflow-hidden rounded-[1.5rem] border border-slate-200 bg-slate-50 transition hover:-translate-y-1 hover:shadow-[0_16px_35px_rgba(15,23,42,0.08)]"
                       style={{ animationDelay: `${0.08 * (index + 1)}s` }}
                     >
@@ -343,7 +344,7 @@ const HomePage = () => {
                   {trendingStories.map((article, index) => (
                     <Link
                       key={article._id}
-                      to={`/articles/${article._id}`}
+                      to={createArticlePath(article)}
                       className="block border-b border-white/10 pb-4 last:border-b-0 last:pb-0"
                     >
                       <p className="text-[0.7rem] font-bold uppercase tracking-[0.28em] text-white/56">

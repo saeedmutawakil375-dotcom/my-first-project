@@ -24,7 +24,7 @@ const estimateReadMinutes = (text = "") => {
 };
 
 const ArticleDetailsPage = () => {
-  const { id } = useParams();
+  const { slugOrId } = useParams();
   const { user } = useAuth();
   const [article, setArticle] = useState(null);
   const [comments, setComments] = useState([]);
@@ -46,7 +46,7 @@ const ArticleDetailsPage = () => {
 
   const fetchArticleDetails = async () => {
     try {
-      const response = await api.get(`/articles/${id}`);
+      const response = await api.get(`/articles/${slugOrId}`);
       setArticle(response.data.article);
       setComments(response.data.comments);
       setArticleForm({
@@ -66,7 +66,7 @@ const ArticleDetailsPage = () => {
 
   useEffect(() => {
     fetchArticleDetails();
-  }, [id]);
+  }, [slugOrId]);
 
   const handleCommentSubmit = async (event) => {
     event.preventDefault();
@@ -80,7 +80,7 @@ const ArticleDetailsPage = () => {
     setError("");
 
     try {
-      await api.post(`/articles/${id}/comments`, { text: commentText });
+      await api.post(`/articles/${article._id}/comments`, { text: commentText });
       setCommentText("");
       await fetchArticleDetails();
     } catch (err) {
@@ -117,7 +117,7 @@ const ArticleDetailsPage = () => {
     setError("");
 
     try {
-      await api.put(`/articles/${id}`, articleForm);
+      await api.put(`/articles/${article._id}`, articleForm);
       setEditingArticle(false);
       await fetchArticleDetails();
     } catch (err) {
@@ -135,7 +135,7 @@ const ArticleDetailsPage = () => {
     }
 
     try {
-      await api.delete(`/articles/${id}`);
+      await api.delete(`/articles/${article._id}`);
       window.location.href = "/";
     } catch (err) {
       setError(err.response?.data?.message || "Unable to delete article");

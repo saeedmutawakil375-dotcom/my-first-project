@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import createArticlePath from "../utils/articlePath";
 
 const estimateReadMinutes = (text = "") => {
   const words = text.trim().split(/\s+/).filter(Boolean).length;
@@ -11,7 +12,7 @@ const ArticleCard = ({ article }) => {
   return (
     <article className="group overflow-hidden rounded-[1.75rem] border border-slate-200 bg-white shadow-[0_18px_45px_rgba(15,23,42,0.08)] transition duration-500 hover:-translate-y-1 hover:shadow-[0_24px_55px_rgba(15,23,42,0.14)]">
       <div className="grid gap-0 lg:grid-cols-[1.15fr_0.85fr]">
-        <Link to={`/articles/${article._id}`} className="relative min-h-[18rem] overflow-hidden">
+        <Link to={createArticlePath(article)} className="relative min-h-[18rem] overflow-hidden">
           <div className="absolute inset-0 z-10 bg-gradient-to-t from-[#07111f] via-[#07111f]/20 to-transparent" />
           <img
             src={article.featuredImage}
@@ -50,7 +51,7 @@ const ArticleCard = ({ article }) => {
                 "Global reporting and analysis from the Atlas Wire network."}
             </p>
             <Link
-              to={`/articles/${article._id}`}
+              to={createArticlePath(article)}
               className="mt-5 inline-flex items-center gap-2 text-sm font-bold uppercase tracking-[0.24em] text-[#b80018]"
             >
               Read full report
