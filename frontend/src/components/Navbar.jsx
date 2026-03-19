@@ -1,16 +1,6 @@
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-
-const primarySections = [
-  "World",
-  "Technology",
-  "Business",
-  "Finance",
-  "Sports",
-  "Entertainment",
-  "Health",
-  "Science"
-];
+import { createSectionPath, primarySections } from "../utils/newsSections";
 
 const Navbar = () => {
   const { user, logout } = useAuth();
@@ -46,7 +36,7 @@ const Navbar = () => {
           <Link to="/" className="group">
             <div className="flex items-center gap-4">
               <div className="grid h-14 w-14 place-items-center rounded-sm bg-[#b80018] text-xl font-extrabold tracking-[0.18em] text-white shadow-[0_14px_30px_rgba(184,0,24,0.35)]">
-                CC
+                AW
               </div>
               <div>
                 <p className="text-[0.72rem] font-semibold uppercase tracking-[0.44em] text-white/55">
@@ -132,13 +122,19 @@ const Navbar = () => {
             </span>
             <div className="hidden lg:flex flex-wrap gap-6 text-sm font-semibold uppercase tracking-[0.2em] text-white/72">
               {primarySections.map((section) => (
-                <span key={section} className="transition hover:text-white">
+                <NavLink
+                  key={section}
+                  to={createSectionPath(section)}
+                  className={({ isActive }) =>
+                    isActive ? "text-white" : "transition hover:text-white"
+                  }
+                >
                   {section}
-                </span>
+                </NavLink>
               ))}
             </div>
             <div className="lg:hidden text-sm uppercase tracking-[0.2em] text-white/72">
-              World • Tech • Finance • Sport • Entertainment
+              World | Tech | Finance | Sport | Entertainment
             </div>
           </div>
         </div>

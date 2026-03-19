@@ -4,6 +4,7 @@ import api from "../api";
 import ArticleCard from "../components/ArticleCard";
 import usePageMeta from "../hooks/usePageMeta";
 import createArticlePath from "../utils/articlePath";
+import { createSectionPath } from "../utils/newsSections";
 
 const sections = [
   "All",
@@ -173,21 +174,36 @@ const HomePage = () => {
         </div>
 
         <div className="mt-6 flex flex-wrap gap-3">
-          {sections.map((section, index) => (
-            <button
-              key={section}
-              type="button"
-              onClick={() => setActiveSection(section)}
-              className={`animate-fade-up rounded-full border px-4 py-2 text-sm font-bold uppercase tracking-[0.22em] transition ${
-                activeSection === section
-                  ? "border-[#b80018] bg-[#b80018] text-white shadow-[0_12px_24px_rgba(184,0,24,0.18)]"
-                  : "border-slate-200 bg-white text-slate-600 hover:border-[#b80018] hover:text-[#b80018]"
-              }`}
-              style={{ animationDelay: `${0.03 * index}s` }}
-            >
-              {section}
-            </button>
-          ))}
+          {sections.map((section, index) =>
+            section === "All" ? (
+              <button
+                key={section}
+                type="button"
+                onClick={() => setActiveSection(section)}
+                className={`animate-fade-up rounded-full border px-4 py-2 text-sm font-bold uppercase tracking-[0.22em] transition ${
+                  activeSection === section
+                    ? "border-[#b80018] bg-[#b80018] text-white shadow-[0_12px_24px_rgba(184,0,24,0.18)]"
+                    : "border-slate-200 bg-white text-slate-600 hover:border-[#b80018] hover:text-[#b80018]"
+                }`}
+                style={{ animationDelay: `${0.03 * index}s` }}
+              >
+                {section}
+              </button>
+            ) : (
+              <Link
+                key={section}
+                to={createSectionPath(section)}
+                className={`animate-fade-up rounded-full border px-4 py-2 text-sm font-bold uppercase tracking-[0.22em] transition ${
+                  activeSection === section
+                    ? "border-[#b80018] bg-[#b80018] text-white shadow-[0_12px_24px_rgba(184,0,24,0.18)]"
+                    : "border-slate-200 bg-white text-slate-600 hover:border-[#b80018] hover:text-[#b80018]"
+                }`}
+                style={{ animationDelay: `${0.03 * index}s` }}
+              >
+                {section}
+              </Link>
+            )
+          )}
         </div>
       </section>
 
