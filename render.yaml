@@ -1,10 +1,9 @@
 services:
   - type: web
-    name: current-chronicle-api
+    name: current-chronicle
     runtime: node
-    rootDir: backend
-    buildCommand: npm install
-    startCommand: npm start
+    buildCommand: cd backend && npm install && cd ../frontend && npm install && npm run build
+    startCommand: cd backend && npm start
     envVars:
       - key: MONGO_URI
         sync: false

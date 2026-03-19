@@ -87,7 +87,7 @@ Create `backend/.env`:
 PORT=5000
 MONGO_URI=mongodb://your-username:your-password@your-cluster-host/current-chronicle?ssl=true&replicaSet=your-replica-set&authSource=admin&appName=CurrentChronicle
 JWT_SECRET=replace_with_a_long_random_secret
-CLIENT_URLS=http://localhost:5173,https://your-frontend-domain.vercel.app
+CLIENT_URLS=http://localhost:5173
 USE_MEMORY_DB=false
 ```
 
@@ -139,36 +139,24 @@ VITE_API_URL=http://localhost:5000/api
 
 ## Deployment
 
-### Backend on Render or Railway
+### Free Deploy On Render With One Service
 
-- The repo already includes [render.yaml](/C:/Users/saeed/my-website/current-chronicle/render.yaml) for a Render web service.
-- Render backend settings:
-  Build Command: `npm install`
-  Start Command: `npm start`
-  Root Directory: `backend`
+- Ignore Blueprint. Use a manual `Web Service` on the free plan.
+- The repo already includes [render.yaml](/C:/Users/saeed/my-website/current-chronicle/render.yaml), but you can also enter these settings manually:
+  Name: `current-chronicle`
+  Branch: `main`
+  Runtime: `Node`
+  Root Directory: leave empty
+  Build Command: `cd backend && npm install && cd ../frontend && npm install && npm run build`
+  Start Command: `cd backend && npm start`
 - Add these environment variables in Render:
   `MONGO_URI`
   `JWT_SECRET`
-  `CLIENT_URLS`
+  `CLIENT_URLS=https://your-render-service.onrender.com`
   `USE_MEMORY_DB=false`
 - Optional but recommended health path: `/health`
-- After the backend is live, open a Render shell or run locally against the same database and execute `npm run seed` in `backend`.
-
-### Frontend on Vercel or Netlify
-
-- The repo already includes [vercel.json](/C:/Users/saeed/my-website/current-chronicle/frontend/vercel.json) to support React Router rewrites.
-- Vercel frontend settings:
-  Framework Preset: `Vite`
-  Root Directory: `frontend`
-  Build Command: `npm run build`
-  Output Directory: `dist`
-- Add `VITE_API_URL` pointing to your deployed backend URL, for example:
-
-```env
-VITE_API_URL=https://your-backend-service.onrender.com/api
-```
-
-- Add your deployed frontend domain to `CLIENT_URLS` on Render so browser requests are allowed.
+- This deployment path serves the React frontend from Express, so you only need one Render service and one public URL.
+- After the service is live, run `npm run seed` in `backend` against the same production MongoDB to add viewer content.
 
 ## Content For Viewers
 
