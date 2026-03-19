@@ -33,6 +33,13 @@ const AuthProvider = ({ children }) => {
     return response.data;
   };
 
+  const updateProfile = async (formData) => {
+    const response = await api.put("/users/profile", formData);
+    localStorage.setItem("currentChronicleUser", JSON.stringify(response.data));
+    setUser(response.data);
+    return response.data;
+  };
+
   const logout = () => {
     localStorage.removeItem("currentChronicleUser");
     setUser(null);
@@ -44,6 +51,7 @@ const AuthProvider = ({ children }) => {
       loading,
       register,
       login,
+      updateProfile,
       logout
     }),
     [user, loading]

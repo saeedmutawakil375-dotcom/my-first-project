@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../api";
 import { useAuth } from "../context/AuthContext";
@@ -6,6 +6,7 @@ import { useAuth } from "../context/AuthContext";
 const categories = ["World", "Technology", "Business", "Culture", "Opinion", "Community"];
 
 const NewsroomPage = () => {
+  const { user, updateProfile } = useAuth();
   const [formData, setFormData] = useState({
     category: "Technology",
     title: "",
@@ -16,11 +17,33 @@ const NewsroomPage = () => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
-  const { user } = useAuth();
+  const [profileForm, setProfileForm] = useState({
+    name: user?.name || "",
+    bio: user?.bio || "",
+    password: ""
+  });
+  const [profileMessage, setProfileMessage] = useState("");
+  const [profileError, setProfileError] = useState("");
+  const [profileLoading, setProfileLoading] = useState(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    setProfileForm({
+      name: user?.name || "",
+      bio: user?.bio || "",
+      password: ""
+    });
+  }, [user]);
 
   const handleChange = (event) => {
     setFormData((previous) => ({
+      ...previous,
+      [event.target.name]: event.target.value
+    }));
+  };
+
+  const handleProfileChange = (event) => {
+    setProfileForm((previous) => ({
       ...previous,
       [event.target.name]: event.target.value
     }));
@@ -50,23 +73,126 @@ const NewsroomPage = () => {
     }
   };
 
+  const handleProfileSubmit = async (event) => {
+    event.preventDefault();
+    setProfileLoading(true);
+    setProfileMessage("");
+    setProfileError("");
+
+    try {
+      await updateProfile(profileForm);
+      setProfileMessage("Profile updated successfully.");
+      setProfileForm((previous) => ({
+        ...previous,
+        password: ""
+      }));
+    } catch (err) {
+      setProfileError(err.response?.data?.message || "Unable to update profile");
+    } finally {
+      setProfileLoading(false);
+    }
+  };
+
   return (
     <div className="grid gap-8 lg:grid-cols-[0.85fr_1.15fr]">
-      <section className="border border-black/10 bg-black p-8 text-white">
-        <p className="text-sm font-semibold uppercase tracking-[0.35em] text-white/65">
-          Newsroom Access
-        </p>
-        <h1 className="mt-4 font-display text-4xl leading-tight">Welcome back, {user?.name}</h1>
-        <p className="mt-4 text-lg leading-8 text-white/75">
-          Draft a headline, file a feature, and publish directly to the front page.
-        </p>
-        <div className="mt-8 space-y-4 border-t border-white/15 pt-6 text-sm uppercase tracking-[0.2em] text-white/60">
-          <p>Section: {formData.category}</p>
-          <p>Status: Ready to publish</p>
-          <p>Output: Feature package + commentary</p>
-          <p>Byline: {user?.bio || "Add a strong author bio in your profile."}</p>
-        </div>
-      </section>
+      <div className="space-y-8">
+        <section className="border border-black/10 bg-black p-8 text-white">
+          <p className="text-sm font-semibold uppercase tracking-[0.35em] text-white/65">
+            Newsroom Access
+          </p>
+          <h1 className="mt-4 font-display text-4xl leading-tight">Welcome back, {user?.name}</h1>
+          <p className="mt-4 text-lg leading-8 text-white/75">
+            Draft a headline, file a feature, and publish directly to the front page.
+          </p>
+          <div className="mt-8 space-y-4 border-t border-white/15 pt-6 text-sm uppercase tracking-[0.2em] text-white/60">
+            <p>Section: {formData.category}</p>
+            <p>Status: Ready to publish</p>
+            <p>Output: Feature package + commentary</p>
+            <p>Byline: {user?.bio || "Add a strong author bio in your profile."}</p>
+          </div>
+        </section>
+
+        <section className="border border-black/10 bg-[#faf6ef] p-8">
+          <h2 className="font-display text-3xl text-black">Contributor Profile</h2>
+          <p className="mt-3 text-lg leading-7 text-black/65">
+            Update your byline details so every article carries a sharper editorial identity.
+          </p>
+
+          {profileMessage && (
+            <div className="mt-6 border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
+              {profileMessage}
+            </div>
+          )}
+
+          {profileError && (
+            <div className="mt-6 border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+              {profileError}
+            </div>
+          )}
+
+          <form onSubmit={handleProfileSubmit} className="mt-6 space-y-5">
+            <div>
+              <label
+                htmlFor="profile-name"
+                className="mb-2 block text-sm font-medium uppercase tracking-[0.18em] text-black/60"
+              >
+                Display Name
+              </label>
+              <input
+                id="profile-name"
+                name="name"
+                type="text"
+                value={profileForm.name}
+                onChange={handleProfileChange}
+                className="w-full border border-black/15 bg-white px-4 py-3 outline-none transition focus:border-[#b80018]"
+              />
+            </div>
+
+            <div>
+              <label
+                htmlFor="profile-bio"
+                className="mb-2 block text-sm font-medium uppercase tracking-[0.18em] text-black/60"
+              >
+                Author Bio
+              </label>
+              <textarea
+                id="profile-bio"
+                name="bio"
+                rows="4"
+                value={profileForm.bio}
+                onChange={handleProfileChange}
+                className="w-full border border-black/15 bg-white px-4 py-3 outline-none transition focus:border-[#b80018]"
+              />
+            </div>
+
+            <div>
+              <label
+                htmlFor="profile-password"
+                className="mb-2 block text-sm font-medium uppercase tracking-[0.18em] text-black/60"
+              >
+                New Password
+              </label>
+              <input
+                id="profile-password"
+                name="password"
+                type="password"
+                value={profileForm.password}
+                onChange={handleProfileChange}
+                className="w-full border border-black/15 bg-white px-4 py-3 outline-none transition focus:border-[#b80018]"
+                placeholder="Leave blank to keep your current password"
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={profileLoading}
+              className="border border-black bg-black px-6 py-3 font-semibold uppercase tracking-[0.2em] text-white transition hover:bg-[#b80018] disabled:cursor-not-allowed disabled:opacity-70"
+            >
+              {profileLoading ? "Saving..." : "Save Profile"}
+            </button>
+          </form>
+        </section>
+      </div>
 
       <section className="border border-black/10 bg-[#fbf8f2] p-8">
         <h2 className="font-display text-3xl text-black">Publish a New Article</h2>

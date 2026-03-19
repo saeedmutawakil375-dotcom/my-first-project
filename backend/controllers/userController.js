@@ -69,4 +69,33 @@ const loginUser = async (req, res) => {
   }
 };
 
-export { registerUser, loginUser };
+const updateProfile = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    user.name = req.body.name?.trim() || user.name;
+    user.bio = req.body.bio?.trim() || user.bio;
+
+    if (req.body.password) {
+      user.password = await bcrypt.hash(req.body.password, 10);
+    }
+
+    await user.save();
+
+    return res.status(200).json({
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      bio: user.bio,
+      token: generateToken(user._id)
+    });
+  } catch (error) {
+    return res.status(500).json({ message: "Server error while updating profile" });
+  }
+};
+
+export { registerUser, loginUser, updateProfile };
