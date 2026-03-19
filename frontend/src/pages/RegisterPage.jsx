@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import AuthForm from "../components/AuthForm";
 import { useAuth } from "../context/AuthContext";
+import usePageMeta from "../hooks/usePageMeta";
 
 const RegisterPage = () => {
   const [formData, setFormData] = useState({ name: "", email: "", password: "", bio: "" });
@@ -9,6 +10,12 @@ const RegisterPage = () => {
   const [error, setError] = useState("");
   const { register } = useAuth();
   const navigate = useNavigate();
+
+  usePageMeta({
+    title: "Create Account",
+    description:
+      "Join Atlas Wire and start publishing global reports across world, finance, sports, entertainment, health, and science."
+  });
 
   const handleChange = (event) => {
     setFormData((previous) => ({

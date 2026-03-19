@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../api";
 import { useAuth } from "../context/AuthContext";
+import usePageMeta from "../hooks/usePageMeta";
 
 const categories = [
   "World",
@@ -38,6 +39,12 @@ const NewsroomPage = () => {
   const [profileError, setProfileError] = useState("");
   const [profileLoading, setProfileLoading] = useState(false);
   const navigate = useNavigate();
+
+  usePageMeta({
+    title: "Newsroom",
+    description:
+      "Publish breaking coverage, manage drafts, and oversee your global reporting workflow in the Atlas Wire newsroom."
+  });
 
   useEffect(() => {
     setProfileForm({

@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
 import api from "../api";
 import ArticleCard from "../components/ArticleCard";
+import usePageMeta from "../hooks/usePageMeta";
 
 const sections = [
   "All",
@@ -23,6 +24,12 @@ const HomePage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+
+  usePageMeta({
+    title: "Global News and Trending Stories",
+    description:
+      "Atlas Wire brings together world news, finance, sports, entertainment, health, science, and live trending coverage from one professional front page."
+  });
 
   useEffect(() => {
     const fetchArticles = async () => {

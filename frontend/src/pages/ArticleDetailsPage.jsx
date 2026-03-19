@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import api from "../api";
 import { useAuth } from "../context/AuthContext";
+import usePageMeta from "../hooks/usePageMeta";
 
 const categories = [
   "World",
@@ -35,6 +36,13 @@ const ArticleDetailsPage = () => {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
+
+  usePageMeta({
+    title: article ? article.title : "Story",
+    description:
+      article?.excerpt ||
+      "Read the latest report and follow the conversation on Atlas Wire."
+  });
 
   const fetchArticleDetails = async () => {
     try {
