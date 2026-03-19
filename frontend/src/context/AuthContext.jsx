@@ -10,7 +10,11 @@ const AuthProvider = ({ children }) => {
   useEffect(() => {
     const storedUser = localStorage.getItem("currentChronicleUser");
     if (storedUser) {
-      setUser(JSON.parse(storedUser));
+      try {
+        setUser(JSON.parse(storedUser));
+      } catch (_error) {
+        localStorage.removeItem("currentChronicleUser");
+      }
     }
     setLoading(false);
   }, []);

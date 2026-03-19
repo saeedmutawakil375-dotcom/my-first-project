@@ -8,9 +8,13 @@ api.interceptors.request.use((config) => {
   const authData = localStorage.getItem("currentChronicleUser");
 
   if (authData) {
-    const parsedData = JSON.parse(authData);
-    if (parsedData.token) {
-      config.headers.Authorization = `Bearer ${parsedData.token}`;
+    try {
+      const parsedData = JSON.parse(authData);
+      if (parsedData.token) {
+        config.headers.Authorization = `Bearer ${parsedData.token}`;
+      }
+    } catch (_error) {
+      localStorage.removeItem("currentChronicleUser");
     }
   }
 
