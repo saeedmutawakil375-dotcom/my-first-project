@@ -17,18 +17,15 @@ const allowedOrigins = (process.env.CLIENT_URLS || process.env.CLIENT_URL || "ht
   .split(",")
   .map((origin) => origin.trim())
   .filter(Boolean);
-
-app.use(
-  cors({
-    origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin)) {
-        return callback(null, true);
-      }
-
-      return callback(new Error("CORS origin not allowed"));
+const corsOptions = {
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      return callback(null, true);
     }
-  })
-);
+
+    return callback(new Error("CORS origin not allowed"));
+  }
+};
 app.use(express.json());
 
 app.get("/health", (_req, res) => {
@@ -39,6 +36,7 @@ app.get("/api", (_req, res) => {
   res.json({ message: "Current Chronicle API is running" });
 });
 
+app.use("/api", cors(corsOptions));
 app.use("/api/users", userRoutes);
 app.use("/api/articles", articleRoutes);
 app.use("/api/comments", commentRoutes);
