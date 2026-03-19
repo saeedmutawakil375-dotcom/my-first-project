@@ -12,7 +12,7 @@ const AuthForm = ({
     <div className="mx-auto max-w-xl overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-[0_24px_60px_rgba(15,23,42,0.08)]">
       <div className="border-b border-slate-200 bg-gradient-to-r from-[#07111f] via-[#0d223d] to-[#0d3b66] px-8 py-8 text-white sm:px-10">
         <p className="text-[0.72rem] font-bold uppercase tracking-[0.4em] text-white/65">
-          Current Chronicle
+          Atlas Wire
         </p>
         <h1 className="mt-4 font-display text-4xl leading-tight">{title}</h1>
         <p className="mt-3 max-w-2xl text-lg leading-7 text-white/72">{subtitle}</p>
@@ -81,7 +81,7 @@ const AuthForm = ({
               value={formData.email}
               onChange={onChange}
               className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none transition focus:border-[#b80018] focus:bg-white"
-              placeholder="reporter@currentchronicle.com"
+              placeholder="reporter@atlaswire.com"
               required
             />
           </div>

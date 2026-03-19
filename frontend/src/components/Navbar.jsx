@@ -35,7 +35,7 @@ const Navbar = () => {
             <span>Live Global Coverage</span>
           </div>
           <div className="hidden md:flex items-center gap-5">
-            <span>Current Chronicle World Service</span>
+            <span>Atlas Wire World Service</span>
             <span>{today}</span>
           </div>
         </div>
@@ -53,7 +53,7 @@ const Navbar = () => {
                   Global News Network
                 </p>
                 <p className="font-display text-3xl tracking-tight text-white transition group-hover:text-[#ffd9de] sm:text-4xl">
-                  Current Chronicle
+                  Atlas Wire
                 </p>
               </div>
             </div>

@@ -35,19 +35,19 @@ const seed = async () => {
     const users = await User.insertMany([
       {
         name: "Maya Trent",
-        email: "maya@chronicle.com",
+        email: "maya@atlaswire.com",
         password,
         bio: "Senior world editor tracking geopolitical shifts, diplomacy, and fast-moving international stories."
       },
       {
         name: "Jonah Price",
-        email: "jonah@chronicle.com",
+        email: "jonah@atlaswire.com",
         password,
         bio: "Markets and finance correspondent focused on central banks, growth signals, and investor pressure."
       },
       {
         name: "Elena Ward",
-        email: "elena@chronicle.com",
+        email: "elena@atlaswire.com",
         password,
         bio: "Culture and entertainment journalist covering media, audience behavior, and the global spotlight."
       }
@@ -147,7 +147,7 @@ const seed = async () => {
     ]);
 
     console.log("Seed data created successfully.");
-    console.log("Demo login: maya@chronicle.com / Password123!");
+    console.log("Demo login: maya@atlaswire.com / Password123!");
   } catch (error) {
     console.error("Seed failed:", error.message);
     process.exitCode = 1;

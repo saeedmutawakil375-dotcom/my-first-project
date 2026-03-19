@@ -23,7 +23,7 @@ const userSchema = new mongoose.Schema(
       type: String,
       trim: true,
       maxlength: 220,
-      default: "Contributor at Current Chronicle."
+      default: "Contributor at Atlas Wire."
     }
   },
   {

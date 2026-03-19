@@ -34,7 +34,7 @@ const ArticleCard = ({ article }) => {
         <div className="flex h-full flex-col justify-between bg-white p-6 sm:p-8">
           <div>
             <div className="flex flex-wrap items-center gap-3 text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-slate-500">
-              <span>{article.author?.name || "Chronicle Staff"}</span>
+              <span>{article.author?.name || "Atlas Wire Staff"}</span>
               <span>{new Date(article.createdAt).toLocaleDateString()}</span>
             </div>
 
@@ -47,7 +47,7 @@ const ArticleCard = ({ article }) => {
             </p>
             <p className="mt-3 text-base leading-7 text-slate-600">
               {article.author?.bio ||
-                "Global reporting and analysis from the Current Chronicle network."}
+                "Global reporting and analysis from the Atlas Wire network."}
             </p>
             <Link
               to={`/articles/${article._id}`}

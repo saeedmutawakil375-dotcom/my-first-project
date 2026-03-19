@@ -217,10 +217,10 @@ const ArticleDetailsPage = () => {
             <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-200 pb-6">
               <div>
                 <p className="text-[0.72rem] font-bold uppercase tracking-[0.3em] text-[#b80018]">
-                  By {article.author?.name || "Chronicle Staff"}
+                  By {article.author?.name || "Atlas Wire Staff"}
                 </p>
                 <p className="mt-3 max-w-3xl text-lg leading-8 text-slate-600">
-                  {article.author?.bio || "Global reporting and analysis from Current Chronicle."}
+                  {article.author?.bio || "Global reporting and analysis from Atlas Wire."}
                 </p>
               </div>
 
@@ -529,10 +529,10 @@ const ArticleDetailsPage = () => {
               Correspondent Profile
             </p>
             <h3 className="mt-4 font-display text-3xl text-slate-950">
-              {article.author?.name || "Current Chronicle"}
+              {article.author?.name || "Atlas Wire"}
             </h3>
             <p className="mt-4 text-base leading-7 text-slate-600">
-              {article.author?.bio || "Global reporting and analysis from Current Chronicle."}
+              {article.author?.bio || "Global reporting and analysis from Atlas Wire."}
             </p>
           </div>
         </aside>

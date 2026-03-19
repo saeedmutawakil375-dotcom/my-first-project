@@ -5,7 +5,7 @@ const api = axios.create({
 });
 
 api.interceptors.request.use((config) => {
-  const authData = localStorage.getItem("currentChronicleUser");
+  const authData = localStorage.getItem("atlasWireUser");
 
   if (authData) {
     try {
@@ -14,7 +14,7 @@ api.interceptors.request.use((config) => {
         config.headers.Authorization = `Bearer ${parsedData.token}`;
       }
     } catch (_error) {
-      localStorage.removeItem("currentChronicleUser");
+      localStorage.removeItem("atlasWireUser");
     }
   }
 
