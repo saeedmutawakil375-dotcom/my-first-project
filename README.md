@@ -5,7 +5,7 @@ Current Chronicle is a full-stack editorial publishing platform built with React
 ## Folder Structure
 
 ```text
-solvehub/
+current-chronicle/
   backend/
     config/
     controllers/
@@ -24,7 +24,7 @@ solvehub/
 ## Git Bash Setup Commands
 
 ```bash
-mkdir solvehub && cd solvehub
+mkdir current-chronicle && cd current-chronicle
 git init
 
 mkdir -p backend/{controllers,models,routes,config,middleware}
@@ -44,6 +44,16 @@ npm install
 npm install axios react-router-dom tailwindcss
 npm install -D postcss autoprefixer @vitejs/plugin-react
 npx tailwindcss init -p
+```
+
+## Push To GitHub
+
+Create a GitHub repository named `current-chronicle`, then run:
+
+```bash
+git remote add origin https://github.com/YOUR_USERNAME/current-chronicle.git
+git branch -M main
+git push -u origin main
 ```
 
 ## Backend Run Commands
@@ -75,7 +85,7 @@ Create `backend/.env`:
 
 ```env
 PORT=5000
-MONGO_URI=mongodb://your-username:your-password@your-cluster-host/solvehub?ssl=true&replicaSet=your-replica-set&authSource=admin&appName=CurrentChronicle
+MONGO_URI=mongodb://your-username:your-password@your-cluster-host/current-chronicle?ssl=true&replicaSet=your-replica-set&authSource=admin&appName=CurrentChronicle
 JWT_SECRET=replace_with_a_long_random_secret
 CLIENT_URLS=http://localhost:5173,https://your-frontend-domain.vercel.app
 USE_MEMORY_DB=false
@@ -131,7 +141,7 @@ VITE_API_URL=http://localhost:5000/api
 
 ### Backend on Render or Railway
 
-- The repo already includes [render.yaml](/C:/Users/saeed/my-website/solvehub/render.yaml) for a Render web service.
+- The repo already includes [render.yaml](/C:/Users/saeed/my-website/current-chronicle/render.yaml) for a Render web service.
 - Render backend settings:
   Build Command: `npm install`
   Start Command: `npm start`
@@ -146,7 +156,7 @@ VITE_API_URL=http://localhost:5000/api
 
 ### Frontend on Vercel or Netlify
 
-- The repo already includes [vercel.json](/C:/Users/saeed/my-website/solvehub/frontend/vercel.json) to support React Router rewrites.
+- The repo already includes [vercel.json](/C:/Users/saeed/my-website/current-chronicle/frontend/vercel.json) to support React Router rewrites.
 - Vercel frontend settings:
   Framework Preset: `Vite`
   Root Directory: `frontend`

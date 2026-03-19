@@ -9,7 +9,7 @@ const connectDB = async () => {
 
     if (process.env.USE_MEMORY_DB === "true") {
       memoryServer = await MongoMemoryServer.create();
-      mongoUri = memoryServer.getUri("solvehub");
+      mongoUri = memoryServer.getUri("current-chronicle");
       console.log("Using in-memory MongoDB for local preview");
     }
 

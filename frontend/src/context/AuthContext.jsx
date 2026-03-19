@@ -8,7 +8,7 @@ const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const storedUser = localStorage.getItem("solvehubUser");
+    const storedUser = localStorage.getItem("currentChronicleUser");
     if (storedUser) {
       setUser(JSON.parse(storedUser));
     }
@@ -17,20 +17,20 @@ const AuthProvider = ({ children }) => {
 
   const register = async (formData) => {
     const response = await api.post("/users/register", formData);
-    localStorage.setItem("solvehubUser", JSON.stringify(response.data));
+    localStorage.setItem("currentChronicleUser", JSON.stringify(response.data));
     setUser(response.data);
     return response.data;
   };
 
   const login = async (formData) => {
     const response = await api.post("/users/login", formData);
-    localStorage.setItem("solvehubUser", JSON.stringify(response.data));
+    localStorage.setItem("currentChronicleUser", JSON.stringify(response.data));
     setUser(response.data);
     return response.data;
   };
 
   const logout = () => {
-    localStorage.removeItem("solvehubUser");
+    localStorage.removeItem("currentChronicleUser");
     setUser(null);
   };
 

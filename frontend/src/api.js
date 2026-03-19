@@ -5,7 +5,7 @@ const api = axios.create({
 });
 
 api.interceptors.request.use((config) => {
-  const authData = localStorage.getItem("solvehubUser");
+  const authData = localStorage.getItem("currentChronicleUser");
 
   if (authData) {
     const parsedData = JSON.parse(authData);
