@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../api";
 import { useAuth } from "../context/AuthContext";
+import { useToast } from "../context/ToastContext";
 import usePageMeta from "../hooks/usePageMeta";
 import createArticlePath from "../utils/articlePath";
 
@@ -18,6 +19,7 @@ const categories = [
 
 const NewsroomPage = () => {
   const { user, updateProfile } = useAuth();
+  const { showToast, dismissToast } = useToast();
   const [formData, setFormData] = useState({
     category: "World",
     title: "",
@@ -39,7 +41,10 @@ const NewsroomPage = () => {
   const [profileMessage, setProfileMessage] = useState("");
   const [profileError, setProfileError] = useState("");
   const [profileLoading, setProfileLoading] = useState(false);
+  const [queueLoading, setQueueLoading] = useState(true);
+  const [searchStatus, setSearchStatus] = useState("");
   const navigate = useNavigate();
+  const searchToastId = useRef(null);
 
   usePageMeta({
     title: "Newsroom",
@@ -57,6 +62,19 @@ const NewsroomPage = () => {
 
   useEffect(() => {
     const fetchMyArticles = async () => {
+      setQueueLoading(true);
+      if (newsroomSearch.trim()) {
+        setSearchStatus(`Searching for "${newsroomSearch}"`);
+        searchToastId.current = showToast({
+          title: "Searching Queue",
+          message: `Looking for reports matching "${newsroomSearch}".`,
+          type: "loading",
+          duration: 2000
+        });
+      } else {
+        setSearchStatus("Showing all reports");
+      }
+
       try {
         const response = await api.get("/articles/mine/list", {
           params: {
@@ -64,13 +82,32 @@ const NewsroomPage = () => {
           }
         });
         setMyArticles(response.data);
+        if (newsroomSearch.trim()) {
+          showToast({
+            title: "Queue Updated",
+            message: `Found ${response.data.length} matching report${response.data.length === 1 ? "" : "s"}.`,
+            type: "info"
+          });
+        }
       } catch (_error) {
         setMyArticles([]);
+        showToast({
+          title: "Search Failed",
+          message: "Unable to refresh your coverage queue right now.",
+          type: "error",
+          duration: 4200
+        });
+      } finally {
+        if (searchToastId.current) {
+          dismissToast(searchToastId.current);
+          searchToastId.current = null;
+        }
+        setQueueLoading(false);
       }
     };
 
     fetchMyArticles();
-  }, [newsroomSearch]);
+  }, [dismissToast, newsroomSearch, showToast]);
 
   const handleChange = (event) => {
     setFormData((previous) => ({
@@ -93,6 +130,12 @@ const NewsroomPage = () => {
     setMessage("");
 
     try {
+      showToast({
+        title: formData.status === "published" ? "Publishing Report" : "Saving Draft",
+        message: "Sending your story to the newsroom desk.",
+        type: "loading",
+        duration: 1800
+      });
       const response = await api.post("/articles", formData);
       setMessage(
         formData.status === "published"
@@ -108,9 +151,24 @@ const NewsroomPage = () => {
         status: "draft"
       });
       setNewsroomSearch("");
+      showToast({
+        title: formData.status === "published" ? "Report Published" : "Draft Saved",
+        message:
+          formData.status === "published"
+            ? "Your story is now live on Atlas Wire."
+            : "Your draft is ready in the newsroom queue.",
+        type: "success"
+      });
       navigate(createArticlePath(response.data));
     } catch (err) {
-      setError(err.response?.data?.message || "Unable to publish your report");
+      const message = err.response?.data?.message || "Unable to publish your report";
+      setError(message);
+      showToast({
+        title: "Publishing Failed",
+        message,
+        type: "error",
+        duration: 4500
+      });
     } finally {
       setLoading(false);
     }
@@ -123,21 +181,39 @@ const NewsroomPage = () => {
     setProfileError("");
 
     try {
+      showToast({
+        title: "Updating Profile",
+        message: "Saving your byline and correspondent details.",
+        type: "loading",
+        duration: 1800
+      });
       await updateProfile(profileForm);
       setProfileMessage("Profile updated successfully.");
       setProfileForm((previous) => ({
         ...previous,
         password: ""
       }));
+      showToast({
+        title: "Profile Updated",
+        message: "Your byline is refreshed across the publication.",
+        type: "success"
+      });
     } catch (err) {
-      setProfileError(err.response?.data?.message || "Unable to update profile");
+      const message = err.response?.data?.message || "Unable to update profile";
+      setProfileError(message);
+      showToast({
+        title: "Profile Update Failed",
+        message,
+        type: "error",
+        duration: 4500
+      });
     } finally {
       setProfileLoading(false);
     }
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 lg:space-y-8">
       <section className="animate-fade-up overflow-hidden rounded-[2rem] border border-slate-200 bg-[#07111f] text-white shadow-[0_24px_60px_rgba(15,23,42,0.16)]">
         <div className="grid gap-0 lg:grid-cols-[1.1fr_0.9fr]">
           <div className="bg-[radial-gradient(circle_at_top,_rgba(216,170,72,0.18),_transparent_35%),linear-gradient(160deg,#07111f_0%,#0d223d_42%,#0d3b66_100%)] p-8 sm:p-10">
@@ -442,11 +518,18 @@ const NewsroomPage = () => {
               className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none transition focus:border-[#b80018] focus:bg-white"
               placeholder="Search drafts, live updates, and desk coverage..."
             />
+            <p className="mt-3 text-xs font-semibold uppercase tracking-[0.16em] text-[#6f6758]">
+              {queueLoading ? "Refreshing your queue..." : searchStatus}
+            </p>
           </div>
         </div>
 
         <div className="mt-6 grid gap-4">
-          {myArticles.length === 0 ? (
+          {queueLoading ? (
+            <div className="paper-panel rounded-[1.5rem] border border-[#d9cfba] p-6 text-[#6f6758]">
+              Loading your coverage queue...
+            </div>
+          ) : myArticles.length === 0 ? (
             <div className="rounded-[1.5rem] border border-dashed border-slate-300 bg-slate-50 p-6 text-slate-500">
               No reports found in your queue yet.
             </div>

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import AuthForm from "../components/AuthForm";
 import { useAuth } from "../context/AuthContext";
+import { useToast } from "../context/ToastContext";
 import usePageMeta from "../hooks/usePageMeta";
 
 const LoginPage = () => {
@@ -9,6 +10,7 @@ const LoginPage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const { login } = useAuth();
+  const { showToast } = useToast();
   const navigate = useNavigate();
 
   usePageMeta({
@@ -30,10 +32,28 @@ const LoginPage = () => {
     setLoading(true);
 
     try {
+      showToast({
+        title: "Signing In",
+        message: "Checking your newsroom credentials.",
+        type: "loading",
+        duration: 1800
+      });
       await login(formData);
+      showToast({
+        title: "Welcome Back",
+        message: "You are signed in and ready to publish.",
+        type: "success"
+      });
       navigate("/newsroom");
     } catch (err) {
-      setError(err.response?.data?.message || "Login failed");
+      const message = err.response?.data?.message || "Login failed";
+      setError(message);
+      showToast({
+        title: "Sign In Failed",
+        message,
+        type: "error",
+        duration: 4500
+      });
     } finally {
       setLoading(false);
     }

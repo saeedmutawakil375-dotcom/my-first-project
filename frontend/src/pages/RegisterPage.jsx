@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import AuthForm from "../components/AuthForm";
 import { useAuth } from "../context/AuthContext";
+import { useToast } from "../context/ToastContext";
 import usePageMeta from "../hooks/usePageMeta";
 
 const RegisterPage = () => {
@@ -9,6 +10,7 @@ const RegisterPage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const { register } = useAuth();
+  const { showToast } = useToast();
   const navigate = useNavigate();
 
   usePageMeta({
@@ -30,10 +32,28 @@ const RegisterPage = () => {
     setLoading(true);
 
     try {
+      showToast({
+        title: "Creating Account",
+        message: "Setting up your contributor profile.",
+        type: "loading",
+        duration: 1800
+      });
       await register(formData);
+      showToast({
+        title: "Account Ready",
+        message: "Your contributor account is live.",
+        type: "success"
+      });
       navigate("/newsroom");
     } catch (err) {
-      setError(err.response?.data?.message || "Registration failed");
+      const message = err.response?.data?.message || "Registration failed";
+      setError(message);
+      showToast({
+        title: "Registration Failed",
+        message,
+        type: "error",
+        duration: 4500
+      });
     } finally {
       setLoading(false);
     }

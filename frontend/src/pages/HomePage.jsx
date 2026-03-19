@@ -1,7 +1,8 @@
 import { Link } from "react-router-dom";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import api from "../api";
 import ArticleCard from "../components/ArticleCard";
+import { useToast } from "../context/ToastContext";
 import usePageMeta from "../hooks/usePageMeta";
 import createArticlePath from "../utils/articlePath";
 import { createSectionPath } from "../utils/newsSections";
@@ -59,6 +60,9 @@ const HomePage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [searchStatus, setSearchStatus] = useState("Showing the full front page");
+  const { showToast, dismissToast } = useToast();
+  const searchToastId = useRef(null);
 
   usePageMeta({
     title: "Global News and Trending Stories",
@@ -68,6 +72,18 @@ const HomePage = () => {
 
   useEffect(() => {
     const fetchArticles = async () => {
+      if (searchTerm.trim()) {
+        setSearchStatus(`Searching coverage for "${searchTerm}"`);
+        searchToastId.current = showToast({
+          title: "Searching Coverage",
+          message: `Looking across desks for "${searchTerm}".`,
+          type: "loading",
+          duration: 1800
+        });
+      } else {
+        setSearchStatus("Showing the full front page");
+      }
+
       try {
         const response = await api.get("/articles", {
           params: {
@@ -76,16 +92,33 @@ const HomePage = () => {
           }
         });
         setArticles(response.data);
+        if (searchTerm.trim()) {
+          showToast({
+            title: "Search Updated",
+            message: `Found ${response.data.length} story${response.data.length === 1 ? "" : "ies"} in the archive.`,
+            type: "info"
+          });
+        }
       } catch (err) {
         setError(err.response?.data?.message || "Unable to load global coverage right now.");
+        showToast({
+          title: "Search Failed",
+          message: err.response?.data?.message || "Unable to load global coverage right now.",
+          type: "error",
+          duration: 4200
+        });
       } finally {
+        if (searchToastId.current) {
+          dismissToast(searchToastId.current);
+          searchToastId.current = null;
+        }
         setLoading(false);
       }
     };
 
     setLoading(true);
     fetchArticles();
-  }, [searchTerm]);
+  }, [dismissToast, searchTerm, showToast]);
 
   useEffect(() => {
     const fetchWireHeadlines = async () => {
@@ -236,6 +269,9 @@ const HomePage = () => {
               placeholder="Search world affairs, markets, sport, and culture..."
               className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-5 py-4 text-slate-900 outline-none transition focus:border-[#b80018] focus:bg-white"
             />
+            <p className="mt-3 text-xs font-semibold uppercase tracking-[0.16em] text-[#6f6758]">
+              {loading ? "Refreshing front page..." : searchStatus}
+            </p>
           </div>
         </div>
 

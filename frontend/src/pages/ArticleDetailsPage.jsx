@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import api from "../api";
 import { useAuth } from "../context/AuthContext";
+import { useToast } from "../context/ToastContext";
 import usePageMeta from "../hooks/usePageMeta";
 
 const categories = [
@@ -26,6 +27,7 @@ const estimateReadMinutes = (text = "") => {
 const ArticleDetailsPage = () => {
   const { slugOrId } = useParams();
   const { user } = useAuth();
+  const { showToast } = useToast();
   const [article, setArticle] = useState(null);
   const [comments, setComments] = useState([]);
   const [commentText, setCommentText] = useState("");
@@ -80,11 +82,29 @@ const ArticleDetailsPage = () => {
     setError("");
 
     try {
+      showToast({
+        title: "Publishing Comment",
+        message: "Sending your perspective to the story thread.",
+        type: "loading",
+        duration: 1500
+      });
       await api.post(`/articles/${article._id}/comments`, { text: commentText });
       setCommentText("");
       await fetchArticleDetails();
+      showToast({
+        title: "Comment Published",
+        message: "Your contribution is now live.",
+        type: "success"
+      });
     } catch (err) {
-      setError(err.response?.data?.message || "Unable to publish comment");
+      const message = err.response?.data?.message || "Unable to publish comment";
+      setError(message);
+      showToast({
+        title: "Comment Failed",
+        message,
+        type: "error",
+        duration: 4500
+      });
     } finally {
       setSubmitting(false);
     }
@@ -99,8 +119,20 @@ const ArticleDetailsPage = () => {
     try {
       await api.put(`/comments/${commentId}/recommend`);
       await fetchArticleDetails();
+      showToast({
+        title: "Recommendation Added",
+        message: "The commentary ranking has been updated.",
+        type: "success"
+      });
     } catch (err) {
-      setError(err.response?.data?.message || "Unable to recommend this comment");
+      const message = err.response?.data?.message || "Unable to recommend this comment";
+      setError(message);
+      showToast({
+        title: "Action Failed",
+        message,
+        type: "error",
+        duration: 4500
+      });
     }
   };
 
@@ -120,8 +152,20 @@ const ArticleDetailsPage = () => {
       await api.put(`/articles/${article._id}`, articleForm);
       setEditingArticle(false);
       await fetchArticleDetails();
+      showToast({
+        title: "Story Updated",
+        message: "Your article changes are now saved.",
+        type: "success"
+      });
     } catch (err) {
-      setError(err.response?.data?.message || "Unable to update article");
+      const message = err.response?.data?.message || "Unable to update article";
+      setError(message);
+      showToast({
+        title: "Update Failed",
+        message,
+        type: "error",
+        duration: 4500
+      });
     } finally {
       setSubmitting(false);
     }
@@ -153,8 +197,20 @@ const ArticleDetailsPage = () => {
       setEditingCommentId("");
       setEditingCommentText("");
       await fetchArticleDetails();
+      showToast({
+        title: "Comment Updated",
+        message: "Your edited note is now live.",
+        type: "success"
+      });
     } catch (err) {
-      setError(err.response?.data?.message || "Unable to update comment");
+      const message = err.response?.data?.message || "Unable to update comment";
+      setError(message);
+      showToast({
+        title: "Edit Failed",
+        message,
+        type: "error",
+        duration: 4500
+      });
     }
   };
 
@@ -168,8 +224,20 @@ const ArticleDetailsPage = () => {
     try {
       await api.delete(`/comments/${commentId}`);
       await fetchArticleDetails();
+      showToast({
+        title: "Comment Deleted",
+        message: "The commentary item has been removed.",
+        type: "success"
+      });
     } catch (err) {
-      setError(err.response?.data?.message || "Unable to delete comment");
+      const message = err.response?.data?.message || "Unable to delete comment";
+      setError(message);
+      showToast({
+        title: "Delete Failed",
+        message,
+        type: "error",
+        duration: 4500
+      });
     }
   };
 
