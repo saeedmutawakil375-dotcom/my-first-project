@@ -12,8 +12,11 @@ const NewsroomPage = () => {
     title: "",
     excerpt: "",
     featuredImage: "",
-    description: ""
+    description: "",
+    status: "draft"
   });
+  const [myArticles, setMyArticles] = useState([]);
+  const [newsroomSearch, setNewsroomSearch] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
@@ -34,6 +37,23 @@ const NewsroomPage = () => {
       password: ""
     });
   }, [user]);
+
+  useEffect(() => {
+    const fetchMyArticles = async () => {
+      try {
+        const response = await api.get("/articles/mine/list", {
+          params: {
+            search: newsroomSearch || undefined
+          }
+        });
+        setMyArticles(response.data);
+      } catch (_error) {
+        setMyArticles([]);
+      }
+    };
+
+    fetchMyArticles();
+  }, [newsroomSearch]);
 
   const handleChange = (event) => {
     setFormData((previous) => ({
@@ -57,14 +77,20 @@ const NewsroomPage = () => {
 
     try {
       const response = await api.post("/articles", formData);
-      setMessage("Article published successfully.");
+      setMessage(
+        formData.status === "published"
+          ? "Article published successfully."
+          : "Draft saved to your newsroom."
+      );
       setFormData({
         category: "Technology",
         title: "",
         excerpt: "",
         featuredImage: "",
-        description: ""
+        description: "",
+        status: "draft"
       });
+      setNewsroomSearch("");
       navigate(`/articles/${response.data._id}`);
     } catch (err) {
       setError(err.response?.data?.message || "Unable to publish your article");
@@ -106,7 +132,7 @@ const NewsroomPage = () => {
           </p>
           <div className="mt-8 space-y-4 border-t border-white/15 pt-6 text-sm uppercase tracking-[0.2em] text-white/60">
             <p>Section: {formData.category}</p>
-            <p>Status: Ready to publish</p>
+            <p>Status: {formData.status === "published" ? "Publish on submit" : "Save as draft"}</p>
             <p>Output: Feature package + commentary</p>
             <p>Byline: {user?.bio || "Add a strong author bio in your profile."}</p>
           </div>
@@ -216,6 +242,24 @@ const NewsroomPage = () => {
         <form onSubmit={handleSubmit} className="mt-6 space-y-5">
           <div>
             <label
+              htmlFor="status"
+              className="mb-2 block text-sm font-medium uppercase tracking-[0.18em] text-black/60"
+            >
+              Workflow
+            </label>
+            <select
+              id="status"
+              name="status"
+              value={formData.status}
+              onChange={handleChange}
+              className="w-full border border-black/15 bg-white px-4 py-3 outline-none transition focus:border-[#b80018]"
+            >
+              <option value="draft">Save as Draft</option>
+              <option value="published">Publish Now</option>
+            </select>
+          </div>
+          <div>
+            <label
               htmlFor="category"
               className="mb-2 block text-sm font-medium uppercase tracking-[0.18em] text-black/60"
             >
@@ -317,9 +361,78 @@ const NewsroomPage = () => {
             disabled={loading}
             className="border border-[#b80018] bg-[#b80018] px-6 py-3 font-semibold uppercase tracking-[0.2em] text-white transition hover:bg-[#8f0012] disabled:cursor-not-allowed disabled:opacity-70"
           >
-            {loading ? "Publishing..." : "Publish Article"}
+            {loading
+              ? formData.status === "published"
+                ? "Publishing..."
+                : "Saving..."
+              : formData.status === "published"
+                ? "Publish Article"
+                : "Save Draft"}
           </button>
         </form>
+      </section>
+
+      <section className="border border-black/10 bg-[#faf6ef] p-8 lg:col-span-2">
+        <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+          <div>
+            <h2 className="font-display text-3xl text-black">Your Newsroom Queue</h2>
+            <p className="mt-2 text-lg leading-7 text-black/65">
+              Review your drafts and published articles in one place.
+            </p>
+          </div>
+          <div className="w-full max-w-md">
+            <label
+              htmlFor="newsroom-search"
+              className="mb-2 block text-sm font-medium uppercase tracking-[0.18em] text-black/60"
+            >
+              Search your articles
+            </label>
+            <input
+              id="newsroom-search"
+              type="search"
+              value={newsroomSearch}
+              onChange={(event) => setNewsroomSearch(event.target.value)}
+              className="w-full border border-black/15 bg-white px-4 py-3 outline-none transition focus:border-[#b80018]"
+              placeholder="Search your headlines and drafts..."
+            />
+          </div>
+        </div>
+
+        <div className="mt-6 grid gap-4">
+          {myArticles.length === 0 ? (
+            <div className="border border-dashed border-black/20 bg-white p-6 text-black/60">
+              No articles found in your newsroom yet.
+            </div>
+          ) : (
+            myArticles.map((article) => (
+              <article
+                key={article._id}
+                className="grid gap-4 border border-black/10 bg-white p-5 md:grid-cols-[1fr_auto]"
+              >
+                <div>
+                  <div className="flex flex-wrap items-center gap-3 text-xs font-semibold uppercase tracking-[0.24em] text-black/55">
+                    <span className="bg-[#b80018] px-2 py-1 text-white">{article.category}</span>
+                    <span>{article.status === "published" ? "published" : "draft"}</span>
+                    <span>{new Date(article.updatedAt).toLocaleDateString()}</span>
+                  </div>
+                  <h3 className="mt-3 font-display text-2xl text-black">{article.title}</h3>
+                  <p className="mt-3 max-w-3xl text-base leading-7 text-black/70">
+                    {article.excerpt}
+                  </p>
+                </div>
+                <div className="flex items-center">
+                  <button
+                    type="button"
+                    onClick={() => navigate(`/articles/${article._id}`)}
+                    className="border border-black px-4 py-2 text-sm font-semibold uppercase tracking-[0.18em] text-black transition hover:border-[#b80018] hover:text-[#b80018]"
+                  >
+                    Open
+                  </button>
+                </div>
+              </article>
+            ))
+          )}
+        </div>
       </section>
     </div>
   );

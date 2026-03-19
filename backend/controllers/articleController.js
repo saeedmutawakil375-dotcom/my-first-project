@@ -3,7 +3,7 @@ import Comment from "../models/commentModel.js";
 
 const createArticle = async (req, res) => {
   try {
-    const { category, title, excerpt, description, featuredImage } = req.body;
+    const { category, title, excerpt, description, featuredImage, status } = req.body;
 
     if (!category || !title || !excerpt || !description || !featuredImage) {
       return res.status(400).json({
@@ -17,6 +17,7 @@ const createArticle = async (req, res) => {
       excerpt,
       description,
       featuredImage,
+      status: status === "published" ? "published" : "draft",
       author: req.user._id
     });
 
@@ -30,7 +31,7 @@ const createArticle = async (req, res) => {
 
 const updateArticle = async (req, res) => {
   try {
-    const { category, title, excerpt, description, featuredImage } = req.body;
+    const { category, title, excerpt, description, featuredImage, status } = req.body;
 
     if (!category || !title || !excerpt || !description || !featuredImage) {
       return res.status(400).json({
@@ -53,6 +54,7 @@ const updateArticle = async (req, res) => {
     article.excerpt = excerpt;
     article.description = description;
     article.featuredImage = featuredImage;
+    article.status = status === "published" ? "published" : "draft";
 
     await article.save();
 
@@ -88,9 +90,40 @@ const deleteArticle = async (req, res) => {
   }
 };
 
-const getArticles = async (_req, res) => {
+const getArticles = async (req, res) => {
   try {
-    const articles = await Article.find()
+    const search = req.query.search?.trim();
+    const category = req.query.category?.trim();
+    const status = req.query.status?.trim();
+    const authorId = req.query.author?.trim();
+    const filter = {};
+
+    if (category && category !== "All") {
+      filter.category = category;
+    }
+
+    if (!status || status === "published") {
+      filter.status = "published";
+    } else if (status === "draft" && req.user) {
+      filter.status = "draft";
+      filter.author = req.user._id;
+    } else if (req.user) {
+      filter.status = status;
+    }
+
+    if (authorId) {
+      filter.author = authorId;
+    }
+
+    if (search) {
+      filter.$or = [
+        { title: { $regex: search, $options: "i" } },
+        { excerpt: { $regex: search, $options: "i" } },
+        { description: { $regex: search, $options: "i" } }
+      ];
+    }
+
+    const articles = await Article.find(filter)
       .populate("author", "name email bio")
       .sort({ createdAt: -1 });
 
@@ -108,6 +141,13 @@ const getArticleById = async (req, res) => {
       return res.status(404).json({ message: "Article not found" });
     }
 
+    if (
+      article.status !== "published" &&
+      (!req.user || article.author._id.toString() !== req.user._id.toString())
+    ) {
+      return res.status(404).json({ message: "Article not found" });
+    }
+
     const comments = await Comment.find({ articleId: article._id })
       .populate("author", "name email bio")
       .sort({ likes: -1, createdAt: -1 });
@@ -118,4 +158,34 @@ const getArticleById = async (req, res) => {
   }
 };
 
-export { createArticle, updateArticle, deleteArticle, getArticles, getArticleById };
+const getMyArticles = async (req, res) => {
+  try {
+    const search = req.query.search?.trim();
+    const filter = { author: req.user._id };
+
+    if (search) {
+      filter.$or = [
+        { title: { $regex: search, $options: "i" } },
+        { excerpt: { $regex: search, $options: "i" } },
+        { description: { $regex: search, $options: "i" } }
+      ];
+    }
+
+    const articles = await Article.find(filter)
+      .populate("author", "name email bio")
+      .sort({ updatedAt: -1 });
+
+    return res.status(200).json(articles);
+  } catch (error) {
+    return res.status(500).json({ message: "Server error while fetching your newsroom articles" });
+  }
+};
+
+export {
+  createArticle,
+  updateArticle,
+  deleteArticle,
+  getArticles,
+  getArticleById,
+  getMyArticles
+};

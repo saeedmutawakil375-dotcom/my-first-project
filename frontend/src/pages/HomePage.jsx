@@ -7,13 +7,20 @@ const sections = ["All", "World", "Technology", "Business", "Culture", "Opinion"
 const HomePage = () => {
   const [articles, setArticles] = useState([]);
   const [activeSection, setActiveSection] = useState("All");
+  const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
     const fetchArticles = async () => {
       try {
-        const response = await api.get("/articles");
+        const response = await api.get("/articles", {
+          params: {
+            status: "published",
+            category: activeSection,
+            search: searchTerm || undefined
+          }
+        });
         setArticles(response.data);
       } catch (err) {
         setError(err.response?.data?.message || "Unable to load articles right now.");
@@ -22,20 +29,34 @@ const HomePage = () => {
       }
     };
 
+    setLoading(true);
     fetchArticles();
-  }, []);
+  }, [activeSection, searchTerm]);
 
-  const filteredArticles =
-    activeSection === "All"
-      ? articles
-      : articles.filter((article) => article.category === activeSection);
-  const leadStory = filteredArticles[0];
-  const secondaryStories = filteredArticles.slice(1, 3);
-  const latestStories = filteredArticles.slice(1);
+  const leadStory = articles[0];
+  const secondaryStories = articles.slice(1, 3);
+  const latestStories = articles.slice(1);
 
   return (
     <div className="space-y-10">
-      <section className="flex flex-wrap items-center gap-3 border-y border-black/10 py-4">
+      <section className="flex flex-col gap-4 border-y border-black/10 py-4">
+        <div className="max-w-xl">
+          <label
+            htmlFor="search"
+            className="mb-2 block text-sm font-semibold uppercase tracking-[0.2em] text-black/55"
+          >
+            Search the archive
+          </label>
+          <input
+            id="search"
+            type="search"
+            value={searchTerm}
+            onChange={(event) => setSearchTerm(event.target.value)}
+            placeholder="Search headlines, excerpts, and coverage..."
+            className="w-full border border-black/10 bg-[#fbf8f2] px-4 py-3 outline-none transition focus:border-[#b80018]"
+          />
+        </div>
+        <div className="flex flex-wrap items-center gap-3">
         {sections.map((section) => (
           <button
             key={section}
@@ -50,6 +71,7 @@ const HomePage = () => {
             {section}
           </button>
         ))}
+        </div>
       </section>
 
       <section className="grid gap-8 border-b border-black/15 pb-10 lg:grid-cols-[1.6fr_0.8fr]">
@@ -134,7 +156,7 @@ const HomePage = () => {
         </div>
       ) : articles.length === 0 ? (
         <div className="border border-dashed border-black/20 bg-[#fbf8f2] p-10 text-center text-black/60">
-          The front page is empty. Open the newsroom and publish the first article.
+          No published stories matched your search. Try a different section or phrase.
         </div>
       ) : (
         <>
@@ -186,12 +208,13 @@ const HomePage = () => {
               <div className="mb-5">
                 <h2 className="font-display text-3xl text-black">Features and Analysis</h2>
                 <p className="mt-2 text-lg text-black/65">
-                  Long-form articles and developing stories from the {activeSection} desk.
+                  Long-form articles and developing stories from the{" "}
+                  {activeSection === "All" ? "front page" : `${activeSection} desk`}.
                 </p>
               </div>
 
               <div className="space-y-2">
-                {(latestStories.length > 0 ? latestStories : filteredArticles.slice(1)).map((article) => (
+                {(latestStories.length > 0 ? latestStories : articles.slice(1)).map((article) => (
                   <ArticleCard key={article._id} article={article} />
                 ))}
               </div>

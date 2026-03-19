@@ -29,7 +29,8 @@ const ArticleDetailsPage = () => {
         title: response.data.article.title,
         excerpt: response.data.article.excerpt,
         featuredImage: response.data.article.featuredImage,
-        description: response.data.article.description
+        description: response.data.article.description,
+        status: response.data.article.status
       });
     } catch (err) {
       setError(err.response?.data?.message || "Unable to load this article");
@@ -171,6 +172,7 @@ const ArticleDetailsPage = () => {
         <section className="border-b border-black/15 pb-8">
           <div className="flex flex-wrap items-center gap-3 text-xs font-semibold uppercase tracking-[0.3em] text-black/55">
             <span className="bg-[#b80018] px-3 py-1 text-white">{article.category}</span>
+            <span>{article.status === "published" ? "Published" : "Draft"}</span>
             <span>By {article.author?.name || "Staff Reporter"}</span>
           </div>
           <div className="mt-6 overflow-hidden border border-black/10 bg-[#f5efe4]">
@@ -215,6 +217,24 @@ const ArticleDetailsPage = () => {
           <section className="border border-black/10 bg-[#faf6ef] p-6 sm:p-8">
             <h2 className="font-display text-3xl text-black">Edit Article</h2>
             <form onSubmit={handleArticleUpdate} className="mt-6 space-y-5">
+              <div>
+                <label
+                  htmlFor="edit-status"
+                  className="mb-2 block text-sm font-medium uppercase tracking-[0.18em] text-black/60"
+                >
+                  Workflow
+                </label>
+                <select
+                  id="edit-status"
+                  name="status"
+                  value={articleForm.status}
+                  onChange={handleArticleChange}
+                  className="w-full border border-black/15 bg-white px-4 py-3 outline-none transition focus:border-[#b80018]"
+                >
+                  <option value="draft">Save as Draft</option>
+                  <option value="published">Publish Now</option>
+                </select>
+              </div>
               <div>
                 <label
                   htmlFor="edit-category"
@@ -441,6 +461,7 @@ const ArticleDetailsPage = () => {
           <div className="mt-6 space-y-3 text-sm uppercase tracking-[0.2em] text-white/60">
             <p>Author: {article.author?.name || "Staff Reporter"}</p>
             <p>Section: {article.category}</p>
+            <p>Status: {article.status === "published" ? "Published" : "Draft"}</p>
             <p>Published: {new Date(article.createdAt).toLocaleDateString()}</p>
             <p>Comments: {comments.length}</p>
           </div>
