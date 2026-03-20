@@ -22,7 +22,7 @@ const Navbar = () => {
         <div className="mx-auto flex max-w-[94rem] items-center justify-between gap-3 px-3 py-2 text-[0.66rem] font-semibold uppercase tracking-[0.28em] text-white/70 sm:px-5 lg:px-8">
           <div className="flex items-center gap-3">
             <span className="inline-block h-2 w-2 rounded-full bg-[#ba8d3f]" />
-            <span>Live Global Coverage</span>
+            <span>Independent Ghana Coverage</span>
           </div>
           <div className="hidden md:flex items-center gap-5">
             <span>Atlas Wire World Service</span>
@@ -51,13 +51,6 @@ const Navbar = () => {
         </div>
 
         <div className="flex flex-col gap-3 lg:items-end">
-          <div className="hidden flex-wrap items-center gap-2 text-[0.68rem] font-semibold uppercase tracking-[0.2em] text-white/70 sm:flex">
-            <span className="rounded-full border border-white/15 px-3 py-1">Breaking</span>
-            <span className="rounded-full border border-white/15 px-3 py-1">Markets</span>
-            <span className="rounded-full border border-white/15 px-3 py-1">Sport</span>
-            <span className="rounded-full border border-white/15 px-3 py-1">Culture</span>
-          </div>
-
           <div className="flex flex-wrap items-center gap-2 text-[0.78rem] font-semibold uppercase tracking-[0.16em] sm:text-sm sm:tracking-[0.18em]">
             <NavLink
               to="/"
@@ -68,6 +61,16 @@ const Navbar = () => {
               }
             >
               Home
+            </NavLink>
+            <NavLink
+              to="/section/world"
+              className={({ isActive }) =>
+                isActive
+                  ? "rounded-full bg-[#f6f0e4] px-3 py-2 text-[#18212d] sm:px-4"
+                  : "rounded-full border border-white/15 px-3 py-2 text-white/78 transition hover:border-[#f2dec2]/70 hover:text-white sm:px-4"
+              }
+            >
+              World
             </NavLink>
 
             {user ? (
