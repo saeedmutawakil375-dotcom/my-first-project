@@ -23,7 +23,8 @@ const api = axios.create({
 });
 
 api.interceptors.request.use((config) => {
-  const authData = localStorage.getItem("atlasWireUser");
+  const authData =
+    localStorage.getItem("saeedDailyUser") || localStorage.getItem("atlasWireUser");
 
   if (authData) {
     try {
@@ -32,6 +33,7 @@ api.interceptors.request.use((config) => {
         config.headers.Authorization = `Bearer ${parsedData.token}`;
       }
     } catch (_error) {
+      localStorage.removeItem("saeedDailyUser");
       localStorage.removeItem("atlasWireUser");
     }
   }

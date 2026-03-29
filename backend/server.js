@@ -40,7 +40,7 @@ app.get("/health", (_req, res) => {
 });
 
 app.get("/api", (_req, res) => {
-  res.json({ message: "Atlas Wire API is running" });
+  res.json({ message: "SAEED DAILY API is running" });
 });
 
 app.use("/api", cors(corsOptions));

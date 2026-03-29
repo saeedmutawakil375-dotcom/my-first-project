@@ -1,9 +1,12 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import api from "../api";
+import ShareButton from "../components/ShareButton";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
 import usePageMeta from "../hooks/usePageMeta";
+import createArticlePath from "../utils/articlePath";
+import { getYouTubeEmbedUrl } from "../utils/youtube";
 
 const categories = [
   "World",
@@ -22,40 +25,6 @@ const categories = [
 const estimateReadMinutes = (text = "") => {
   const words = text.trim().split(/\s+/).filter(Boolean).length;
   return Math.max(2, Math.ceil(words / 180));
-};
-
-const getYouTubeEmbedUrl = (url = "") => {
-  if (!url) {
-    return "";
-  }
-
-  try {
-    const parsedUrl = new URL(url);
-    const host = parsedUrl.hostname.replace("www.", "");
-
-    if (host === "youtu.be") {
-      const videoId = parsedUrl.pathname.replace("/", "");
-      return videoId
-        ? `https://www.youtube-nocookie.com/embed/${videoId}?rel=0&modestbranding=1`
-        : "";
-    }
-
-    if (host.includes("youtube.com")) {
-      const videoId = parsedUrl.searchParams.get("v");
-      if (videoId) {
-        return `https://www.youtube-nocookie.com/embed/${videoId}?rel=0&modestbranding=1`;
-      }
-
-      const pathMatch = parsedUrl.pathname.match(/\/live\/([^/]+)/);
-      if (pathMatch?.[1]) {
-        return `https://www.youtube-nocookie.com/embed/${pathMatch[1]}?rel=0&modestbranding=1`;
-      }
-    }
-  } catch (_error) {
-    return "";
-  }
-
-  return "";
 };
 
 const ArticleDetailsPage = () => {
@@ -77,7 +46,7 @@ const ArticleDetailsPage = () => {
     title: article ? article.title : "Story",
     description:
       article?.excerpt ||
-      "Read the latest report and follow the conversation on Atlas Wire."
+      "Read the latest story and follow the conversation on SAEED DAILY."
   });
 
   const fetchArticleDetails = async () => {
@@ -109,7 +78,7 @@ const ArticleDetailsPage = () => {
     event.preventDefault();
 
     if (!user) {
-      setError("Please sign in to publish a comment.");
+      setError("Please sign in to leave feedback.");
       return;
     }
 
@@ -118,8 +87,8 @@ const ArticleDetailsPage = () => {
 
     try {
       showToast({
-        title: "Publishing Comment",
-        message: "Sending your perspective to the story thread.",
+        title: "Posting Feedback",
+        message: "Sending your response to the conversation.",
         type: "loading",
         duration: 1500
       });
@@ -127,8 +96,8 @@ const ArticleDetailsPage = () => {
       setCommentText("");
       await fetchArticleDetails();
       showToast({
-        title: "Comment Published",
-        message: "Your contribution is now live.",
+        title: "Feedback Posted",
+        message: "Your response is now live on the story.",
         type: "success"
       });
     } catch (err) {
@@ -155,8 +124,8 @@ const ArticleDetailsPage = () => {
       await api.put(`/comments/${commentId}/recommend`);
       await fetchArticleDetails();
       showToast({
-        title: "Recommendation Added",
-        message: "The commentary ranking has been updated.",
+        title: "Reaction Added",
+        message: "That feedback now ranks higher in the conversation.",
         type: "success"
       });
     } catch (err) {
@@ -188,8 +157,8 @@ const ArticleDetailsPage = () => {
       setEditingArticle(false);
       await fetchArticleDetails();
       showToast({
-        title: "Story Updated",
-        message: "Your article changes are now saved.",
+        title: "Post Updated",
+        message: "Your story changes are now live.",
         type: "success"
       });
     } catch (err) {
@@ -207,7 +176,7 @@ const ArticleDetailsPage = () => {
   };
 
   const handleArticleDelete = async () => {
-    const confirmed = window.confirm("Delete this article and all of its commentary?");
+    const confirmed = window.confirm("Delete this post and all of its feedback?");
 
     if (!confirmed) {
       return;
@@ -233,8 +202,8 @@ const ArticleDetailsPage = () => {
       setEditingCommentText("");
       await fetchArticleDetails();
       showToast({
-        title: "Comment Updated",
-        message: "Your edited note is now live.",
+        title: "Feedback Updated",
+        message: "Your edited response is now live.",
         type: "success"
       });
     } catch (err) {
@@ -250,7 +219,7 @@ const ArticleDetailsPage = () => {
   };
 
   const handleCommentDelete = async (commentId) => {
-    const confirmed = window.confirm("Delete this comment?");
+    const confirmed = window.confirm("Delete this feedback?");
 
     if (!confirmed) {
       return;
@@ -260,8 +229,8 @@ const ArticleDetailsPage = () => {
       await api.delete(`/comments/${commentId}`);
       await fetchArticleDetails();
       showToast({
-        title: "Comment Deleted",
-        message: "The commentary item has been removed.",
+        title: "Feedback Deleted",
+        message: "The response has been removed.",
         type: "success"
       });
     } catch (err) {
@@ -283,7 +252,7 @@ const ArticleDetailsPage = () => {
   if (loading) {
     return (
       <div className="rounded-[2rem] border border-slate-200 bg-white p-12 text-center text-slate-500 shadow-[0_18px_45px_rgba(15,23,42,0.08)]">
-        Loading article...
+        Loading post...
       </div>
     );
   }
@@ -291,7 +260,7 @@ const ArticleDetailsPage = () => {
   if (!article) {
     return (
       <div className="rounded-[2rem] border border-red-200 bg-red-50 p-12 text-center text-red-700 shadow-[0_18px_45px_rgba(15,23,42,0.08)]">
-        {error || "Article not found"}
+        {error || "Post not found"}
       </div>
     );
   }
@@ -308,7 +277,7 @@ const ArticleDetailsPage = () => {
           />
           <div className="absolute inset-x-0 bottom-0 z-20 p-6 text-white sm:p-8 lg:p-10">
             <div className="flex flex-wrap items-center gap-3 text-[0.72rem] font-bold uppercase tracking-[0.3em] text-white/80">
-              <span className="rounded-full bg-[#b80018] px-3 py-1 text-white">
+              <span className="rounded-full bg-[#4c8df6] px-3 py-1 text-white">
                 {article.category}
               </span>
               <span>{article.status === "published" ? "Published" : "Draft"}</span>
@@ -328,32 +297,39 @@ const ArticleDetailsPage = () => {
           <section className="animate-fade-up rounded-[2rem] border border-slate-200 bg-white p-6 shadow-[0_18px_45px_rgba(15,23,42,0.08)] sm:p-8">
             <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-200 pb-6">
               <div>
-                <p className="text-[0.72rem] font-bold uppercase tracking-[0.3em] text-[#b80018]">
-                  By {article.author?.name || "Atlas Wire Staff"}
+                <p className="text-[0.72rem] font-bold uppercase tracking-[0.3em] text-[#4c8df6]">
+                  By {article.author?.name || "SAEED DAILY Team"}
                 </p>
                 <p className="mt-3 max-w-3xl text-lg leading-8 text-slate-600">
-                  {article.author?.bio || "Global reporting and analysis from Atlas Wire."}
+                  {article.author?.bio || "Creator commentary and reporting from SAEED DAILY."}
                 </p>
               </div>
 
-              {isArticleOwner && (
-                <div className="flex flex-wrap gap-3">
-                  <button
-                    type="button"
-                    onClick={() => setEditingArticle((previous) => !previous)}
-                    className="rounded-full border border-slate-300 px-4 py-2 text-sm font-bold uppercase tracking-[0.18em] text-slate-800 transition hover:border-[#b80018] hover:text-[#b80018]"
-                  >
-                    {editingArticle ? "Close editor" : "Edit article"}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={handleArticleDelete}
-                    className="rounded-full border border-red-300 px-4 py-2 text-sm font-bold uppercase tracking-[0.18em] text-red-700 transition hover:bg-red-50"
-                  >
-                    Delete article
-                  </button>
-                </div>
-              )}
+              <div className="flex flex-wrap gap-3">
+                <ShareButton
+                  title={article.title}
+                  path={createArticlePath(article)}
+                  className="rounded-full border border-slate-300 px-4 py-2 text-sm font-bold uppercase tracking-[0.18em] text-slate-800 transition hover:border-[#4c8df6] hover:text-[#4c8df6]"
+                />
+                {isArticleOwner ? (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => setEditingArticle((previous) => !previous)}
+                      className="rounded-full border border-slate-300 px-4 py-2 text-sm font-bold uppercase tracking-[0.18em] text-slate-800 transition hover:border-[#4c8df6] hover:text-[#4c8df6]"
+                    >
+                      {editingArticle ? "Close editor" : "Edit post"}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleArticleDelete}
+                      className="rounded-full border border-red-300 px-4 py-2 text-sm font-bold uppercase tracking-[0.18em] text-red-700 transition hover:bg-red-50"
+                    >
+                      Delete post
+                    </button>
+                  </>
+                ) : null}
+              </div>
             </div>
 
             <div className="mt-8 whitespace-pre-line text-xl leading-10 text-slate-700">
@@ -364,10 +340,10 @@ const ArticleDetailsPage = () => {
           {embeddedVideoUrl ? (
             <section className="animate-fade-up overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-[0_18px_45px_rgba(15,23,42,0.08)]">
               <div className="border-b border-slate-200 px-6 py-5 sm:px-8">
-                <p className="text-[0.72rem] font-bold uppercase tracking-[0.3em] text-[#b80018]">
+                <p className="text-[0.72rem] font-bold uppercase tracking-[0.3em] text-[#4c8df6]">
                   Related Video
                 </p>
-                <h2 className="mt-3 font-display text-3xl text-slate-950">Watch from Kasoa</h2>
+                <h2 className="mt-3 font-display text-3xl text-slate-950">Watch with the story</h2>
               </div>
               <div className="aspect-video bg-black">
                 <iframe
@@ -382,9 +358,9 @@ const ArticleDetailsPage = () => {
             </section>
           ) : null}
 
-          {editingArticle && articleForm && (
+          {editingArticle && articleForm ? (
             <section className="animate-fade-up rounded-[2rem] border border-slate-200 bg-white p-6 shadow-[0_18px_45px_rgba(15,23,42,0.08)] sm:p-8">
-              <h2 className="font-display text-3xl text-slate-950">Edit Story</h2>
+              <h2 className="font-display text-3xl text-slate-950">Edit Post</h2>
               <form onSubmit={handleArticleUpdate} className="mt-6 space-y-5">
                 <div>
                   <label
@@ -398,7 +374,7 @@ const ArticleDetailsPage = () => {
                     name="status"
                     value={articleForm.status}
                     onChange={handleArticleChange}
-                    className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none transition focus:border-[#b80018] focus:bg-white"
+                    className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none transition focus:border-[#4c8df6] focus:bg-white"
                   >
                     <option value="draft">Save as Draft</option>
                     <option value="published">Publish Now</option>
@@ -410,14 +386,14 @@ const ArticleDetailsPage = () => {
                     htmlFor="edit-category"
                     className="mb-2 block text-sm font-medium uppercase tracking-[0.18em] text-slate-500"
                   >
-                    Desk
+                    Category
                   </label>
                   <select
                     id="edit-category"
                     name="category"
                     value={articleForm.category}
                     onChange={handleArticleChange}
-                    className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none transition focus:border-[#b80018] focus:bg-white"
+                    className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none transition focus:border-[#4c8df6] focus:bg-white"
                   >
                     {categories.map((category) => (
                       <option key={category} value={category}>
@@ -439,7 +415,7 @@ const ArticleDetailsPage = () => {
                     name="title"
                     value={articleForm.title}
                     onChange={handleArticleChange}
-                    className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none transition focus:border-[#b80018] focus:bg-white"
+                    className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none transition focus:border-[#4c8df6] focus:bg-white"
                   />
                 </div>
 
@@ -448,7 +424,7 @@ const ArticleDetailsPage = () => {
                     htmlFor="edit-excerpt"
                     className="mb-2 block text-sm font-medium uppercase tracking-[0.18em] text-slate-500"
                   >
-                    Standfirst
+                    Summary
                   </label>
                   <textarea
                     id="edit-excerpt"
@@ -456,7 +432,7 @@ const ArticleDetailsPage = () => {
                     rows="3"
                     value={articleForm.excerpt}
                     onChange={handleArticleChange}
-                    className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none transition focus:border-[#b80018] focus:bg-white"
+                    className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none transition focus:border-[#4c8df6] focus:bg-white"
                   />
                 </div>
 
@@ -472,7 +448,7 @@ const ArticleDetailsPage = () => {
                     name="featuredImage"
                     value={articleForm.featuredImage}
                     onChange={handleArticleChange}
-                    className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none transition focus:border-[#b80018] focus:bg-white"
+                    className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none transition focus:border-[#4c8df6] focus:bg-white"
                   />
                 </div>
 
@@ -488,7 +464,7 @@ const ArticleDetailsPage = () => {
                     name="youtubeUrl"
                     value={articleForm.youtubeUrl}
                     onChange={handleArticleChange}
-                    className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none transition focus:border-[#b80018] focus:bg-white"
+                    className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none transition focus:border-[#4c8df6] focus:bg-white"
                     placeholder="https://www.youtube.com/watch?v=..."
                   />
                 </div>
@@ -498,7 +474,7 @@ const ArticleDetailsPage = () => {
                     htmlFor="edit-description"
                     className="mb-2 block text-sm font-medium uppercase tracking-[0.18em] text-slate-500"
                   >
-                    Story Body
+                    Post Body
                   </label>
                   <textarea
                     id="edit-description"
@@ -506,40 +482,40 @@ const ArticleDetailsPage = () => {
                     rows="8"
                     value={articleForm.description}
                     onChange={handleArticleChange}
-                    className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none transition focus:border-[#b80018] focus:bg-white"
+                    className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none transition focus:border-[#4c8df6] focus:bg-white"
                   />
                 </div>
 
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="rounded-full bg-[#b80018] px-6 py-3 text-sm font-bold uppercase tracking-[0.22em] text-white transition hover:bg-[#d4112b] disabled:cursor-not-allowed disabled:opacity-70"
+                  className="rounded-full bg-[#4c8df6] px-6 py-3 text-sm font-bold uppercase tracking-[0.22em] text-white transition hover:bg-[#3c7add] disabled:cursor-not-allowed disabled:opacity-70"
                 >
-                  {submitting ? "Saving..." : "Save Article"}
+                  {submitting ? "Saving..." : "Save Post"}
                 </button>
               </form>
             </section>
-          )}
+          ) : null}
 
           <section className="animate-fade-up rounded-[2rem] border border-slate-200 bg-white p-6 shadow-[0_18px_45px_rgba(15,23,42,0.08)] sm:p-8">
             <h2 className="font-display text-3xl text-slate-950">Join the Conversation</h2>
             <p className="mt-3 text-lg leading-8 text-slate-600">
-              Add analysis, context, or on-the-ground perspective beneath the report.
+              Leave feedback, context, or a thoughtful reaction beneath the post.
             </p>
 
-            {error && (
+            {error ? (
               <div className="mt-6 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
                 {error}
               </div>
-            )}
+            ) : null}
 
             <form onSubmit={handleCommentSubmit} className="mt-6 space-y-4">
               <textarea
                 rows="6"
                 value={commentText}
                 onChange={(event) => setCommentText(event.target.value)}
-                className="w-full rounded-[1.5rem] border border-slate-200 bg-slate-50 px-4 py-4 outline-none transition focus:border-[#b80018] focus:bg-white"
-                placeholder="Add a reader note, analysis, or informed perspective..."
+                className="w-full rounded-[1.5rem] border border-slate-200 bg-slate-50 px-4 py-4 outline-none transition focus:border-[#4c8df6] focus:bg-white"
+                placeholder="Add your feedback, opinion, or extra insight..."
                 required
               />
               <button
@@ -547,22 +523,22 @@ const ArticleDetailsPage = () => {
                 disabled={submitting}
                 className="rounded-full bg-[#07111f] px-6 py-3 text-sm font-bold uppercase tracking-[0.22em] text-white transition hover:bg-[#0d223d] disabled:cursor-not-allowed disabled:opacity-70"
               >
-                {submitting ? "Publishing..." : "Publish Comment"}
+                {submitting ? "Posting..." : "Post Feedback"}
               </button>
             </form>
           </section>
 
           <section className="space-y-4">
             <div>
-              <p className="text-[0.72rem] font-bold uppercase tracking-[0.3em] text-[#b80018]">
-                Reader Reaction
+              <p className="text-[0.72rem] font-bold uppercase tracking-[0.3em] text-[#4c8df6]">
+                Community Feedback
               </p>
-              <h2 className="mt-3 font-display text-3xl text-slate-950">Top Commentary</h2>
+              <h2 className="mt-3 font-display text-3xl text-slate-950">Top Responses</h2>
             </div>
 
             {comments.length === 0 ? (
               <div className="rounded-[2rem] border border-slate-200 bg-white p-8 text-center text-slate-500 shadow-[0_18px_45px_rgba(15,23,42,0.08)]">
-                No commentary yet. Publish the first reader note.
+                No feedback yet. Be the first to react.
               </div>
             ) : (
               comments.map((comment, index) => (
@@ -573,7 +549,7 @@ const ArticleDetailsPage = () => {
                 >
                   <div className="flex flex-wrap items-center justify-between gap-3">
                     <div>
-                      <p className="text-[0.72rem] font-bold uppercase tracking-[0.28em] text-[#b80018]">
+                      <p className="text-[0.72rem] font-bold uppercase tracking-[0.28em] text-[#4c8df6]">
                         {comment.author?.name || "Guest Contributor"}
                       </p>
                       <p className="mt-2 text-sm text-slate-500">
@@ -583,7 +559,7 @@ const ArticleDetailsPage = () => {
                     <button
                       type="button"
                       onClick={() => handleRecommend(comment._id)}
-                      className="rounded-full border border-slate-200 bg-slate-50 px-4 py-2 text-sm font-bold uppercase tracking-[0.18em] text-slate-700 transition hover:border-[#b80018] hover:text-[#b80018]"
+                      className="rounded-full border border-slate-200 bg-slate-50 px-4 py-2 text-sm font-bold uppercase tracking-[0.18em] text-slate-700 transition hover:border-[#4c8df6] hover:text-[#4c8df6]"
                     >
                       {comment.likes} recommend
                     </button>
@@ -595,7 +571,7 @@ const ArticleDetailsPage = () => {
                         rows="4"
                         value={editingCommentText}
                         onChange={(event) => setEditingCommentText(event.target.value)}
-                        className="w-full rounded-[1.25rem] border border-slate-200 bg-slate-50 px-4 py-3 outline-none transition focus:border-[#b80018] focus:bg-white"
+                        className="w-full rounded-[1.25rem] border border-slate-200 bg-slate-50 px-4 py-3 outline-none transition focus:border-[#4c8df6] focus:bg-white"
                       />
                       <div className="flex flex-wrap gap-3">
                         <button
@@ -603,7 +579,7 @@ const ArticleDetailsPage = () => {
                           onClick={() => handleCommentUpdate(comment._id)}
                           className="rounded-full bg-[#07111f] px-4 py-2 text-sm font-bold uppercase tracking-[0.18em] text-white transition hover:bg-[#0d223d]"
                         >
-                          Save Comment
+                          Save Feedback
                         </button>
                         <button
                           type="button"
@@ -623,24 +599,24 @@ const ArticleDetailsPage = () => {
                     </p>
                   )}
 
-                  {user?._id === comment.author?._id && editingCommentId !== comment._id && (
+                  {user?._id === comment.author?._id && editingCommentId !== comment._id ? (
                     <div className="mt-5 flex flex-wrap gap-3">
                       <button
                         type="button"
                         onClick={() => handleCommentEditStart(comment)}
-                        className="rounded-full border border-slate-200 px-4 py-2 text-sm font-bold uppercase tracking-[0.18em] text-slate-700 transition hover:border-[#b80018] hover:text-[#b80018]"
+                        className="rounded-full border border-slate-200 px-4 py-2 text-sm font-bold uppercase tracking-[0.18em] text-slate-700 transition hover:border-[#4c8df6] hover:text-[#4c8df6]"
                       >
-                        Edit Comment
+                        Edit Feedback
                       </button>
                       <button
                         type="button"
                         onClick={() => handleCommentDelete(comment._id)}
                         className="rounded-full border border-red-300 px-4 py-2 text-sm font-bold uppercase tracking-[0.18em] text-red-700 transition hover:bg-red-50"
                       >
-                        Delete Comment
+                        Delete Feedback
                       </button>
                     </div>
-                  )}
+                  ) : null}
                 </article>
               ))
             )}
@@ -649,12 +625,12 @@ const ArticleDetailsPage = () => {
 
         <aside className="space-y-6">
           <div className="animate-slide-in rounded-[2rem] border border-slate-200 bg-[#07111f] p-6 text-white shadow-[0_18px_45px_rgba(15,23,42,0.16)]">
-            <p className="text-[0.72rem] font-bold uppercase tracking-[0.34em] text-[#d8aa48]">
-              Story Snapshot
+            <p className="text-[0.72rem] font-bold uppercase tracking-[0.34em] text-[#66e0c2]">
+              Post Snapshot
             </p>
             <div className="mt-5 space-y-4 text-sm uppercase tracking-[0.2em] text-white/65">
               <p className="flex items-center justify-between gap-3 border-b border-white/10 pb-4">
-                <span>Desk</span>
+                <span>Category</span>
                 <span className="text-white">{article.category}</span>
               </p>
               <p className="flex items-center justify-between gap-3 border-b border-white/10 pb-4">
@@ -667,22 +643,31 @@ const ArticleDetailsPage = () => {
                 <span>Reading time</span>
                 <span className="text-white">{readMinutes} min</span>
               </p>
-              <p className="flex items-center justify-between gap-3">
-                <span>Reader comments</span>
+              <p className="flex items-center justify-between gap-3 border-b border-white/10 pb-4">
+                <span>Feedback</span>
                 <span className="text-white">{comments.length}</span>
+              </p>
+              <p className="flex items-center justify-between gap-3 border-b border-white/10 pb-4">
+                <span>Sharing</span>
+                <span className="text-white">Enabled</span>
+              </p>
+              <p className="flex items-center justify-between gap-3">
+                <span>Video</span>
+                <span className="text-white">{embeddedVideoUrl ? "Included" : "Optional"}</span>
               </p>
             </div>
           </div>
 
           <div className="animate-slide-in delay-1 rounded-[2rem] border border-slate-200 bg-white p-6 shadow-[0_18px_45px_rgba(15,23,42,0.08)]">
-            <p className="text-[0.72rem] font-bold uppercase tracking-[0.34em] text-[#b80018]">
-              Correspondent Profile
+            <p className="text-[0.72rem] font-bold uppercase tracking-[0.34em] text-[#4c8df6]">
+              Creator Profile
             </p>
             <h3 className="mt-4 font-display text-3xl text-slate-950">
-              {article.author?.name || "Atlas Wire"}
+              {article.author?.name || "SAEED DAILY"}
             </h3>
             <p className="mt-4 text-base leading-7 text-slate-600">
-              {article.author?.bio || "Global reporting and analysis from Atlas Wire."}
+              {article.author?.bio ||
+                "Publishing stories, explainers, and feedback-led posts on SAEED DAILY."}
             </p>
           </div>
         </aside>

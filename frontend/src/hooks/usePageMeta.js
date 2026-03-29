@@ -1,8 +1,8 @@
 import { useEffect } from "react";
 
-const DEFAULT_TITLE = "Atlas Wire";
+const DEFAULT_TITLE = "SAEED DAILY";
 const DEFAULT_DESCRIPTION =
-  "Atlas Wire delivers global news, trending coverage, markets, sport, entertainment, science, and health from one modern front page.";
+  "SAEED DAILY is a modern social publication for stories, videos, searchable live headlines, and community feedback.";
 
 const ensureMetaTag = (selector, attributes) => {
   let element = document.head.querySelector(selector);

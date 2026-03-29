@@ -18,6 +18,14 @@ const App = () => {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/articles/:slugOrId" element={<ArticleDetailsPage />} />
         <Route
+          path="/studio"
+          element={
+            <ProtectedRoute>
+              <NewsroomPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
           path="/newsroom"
           element={
             <ProtectedRoute>

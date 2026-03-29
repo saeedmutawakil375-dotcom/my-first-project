@@ -16,7 +16,7 @@ const RegisterPage = () => {
   usePageMeta({
     title: "Create Account",
     description:
-      "Join Atlas Wire and start publishing global reports across world, finance, sports, entertainment, health, and science."
+      "Join SAEED DAILY and start publishing articles, posts, videos, and feedback-driven stories."
   });
 
   const handleChange = (event) => {
@@ -34,17 +34,17 @@ const RegisterPage = () => {
     try {
       showToast({
         title: "Creating Account",
-        message: "Setting up your contributor profile.",
+        message: "Setting up your SAEED DAILY profile.",
         type: "loading",
         duration: 1800
       });
       await register(formData);
       showToast({
         title: "Account Ready",
-        message: "Your contributor account is live.",
+        message: "Your creator account is live.",
         type: "success"
       });
-      navigate("/newsroom");
+      navigate("/studio");
     } catch (err) {
       const message = err.response?.data?.message || "Registration failed";
       setError(message);
@@ -62,16 +62,15 @@ const RegisterPage = () => {
   return (
     <div className="grid gap-8 xl:grid-cols-[0.85fr_1.15fr] xl:items-stretch">
       <section className="animate-fade-up overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-[0_24px_60px_rgba(15,23,42,0.08)]">
-        <div className="h-full bg-[radial-gradient(circle_at_top,_rgba(184,0,24,0.12),_transparent_40%),linear-gradient(180deg,#ffffff_0%,#f8fafc_100%)] p-8 sm:p-10">
-          <p className="text-[0.72rem] font-bold uppercase tracking-[0.4em] text-[#b80018]">
-            Join the Publication
+        <div className="h-full bg-[radial-gradient(circle_at_top,_rgba(76,141,246,0.12),_transparent_40%),linear-gradient(180deg,#ffffff_0%,#f5f9ff_100%)] p-8 sm:p-10">
+          <p className="text-[0.72rem] font-bold uppercase tracking-[0.4em] text-[#4c8df6]">
+            Join the Platform
           </p>
           <h2 className="mt-5 font-display text-4xl leading-tight text-slate-950 sm:text-5xl">
-            Build your contributor profile and publish across every major sector.
+            Create your profile and start sharing content on SAEED DAILY.
           </h2>
           <p className="mt-5 max-w-2xl text-lg leading-8 text-slate-600">
-            Register once, then report on world affairs, markets, entertainment, sport,
-            science, health, and the big trends shaping the global agenda.
+            Publish blogs, articles, social explainers, and video-backed posts for a modern audience.
           </p>
         </div>
       </section>
@@ -79,7 +78,7 @@ const RegisterPage = () => {
       <div className="space-y-6">
         <AuthForm
           title="Create Account"
-          subtitle="Get newsroom access and start publishing polished reports for a global audience."
+          subtitle="Get your studio access and start publishing on SAEED DAILY."
           formData={formData}
           onChange={handleChange}
           onSubmit={handleSubmit}
@@ -89,7 +88,7 @@ const RegisterPage = () => {
         />
         <p className="text-center text-sm uppercase tracking-[0.18em] text-slate-500">
           Already have an account?{" "}
-          <Link to="/login" className="font-bold text-[#b80018]">
+          <Link to="/login" className="font-bold text-[#4c8df6]">
             Sign in
           </Link>
         </p>

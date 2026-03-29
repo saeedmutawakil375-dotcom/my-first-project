@@ -74,7 +74,7 @@ const parseFeedItems = (xml = "", sourceMeta) => {
 const fetchFeed = async (feedSource) => {
   const response = await fetch(feedSource.url, {
     headers: {
-      "User-Agent": "Atlas Wire Newsroom"
+      "User-Agent": "SAEED DAILY"
     }
   });
 

@@ -48,9 +48,9 @@ const NewsroomPage = () => {
   const searchToastId = useRef(null);
 
   usePageMeta({
-    title: "Newsroom",
+    title: "Creator Studio",
     description:
-      "Publish breaking coverage, manage drafts, and oversee your global reporting workflow in the Atlas Wire newsroom."
+      "Write posts, publish stories, attach YouTube videos, manage drafts, and shape the community feed on SAEED DAILY."
   });
 
   useEffect(() => {
@@ -64,16 +64,17 @@ const NewsroomPage = () => {
   useEffect(() => {
     const fetchMyArticles = async () => {
       setQueueLoading(true);
+
       if (newsroomSearch.trim()) {
         setSearchStatus(`Searching for "${newsroomSearch}"`);
         searchToastId.current = showToast({
-          title: "Searching Queue",
-          message: `Looking for reports matching "${newsroomSearch}".`,
+          title: "Searching Studio",
+          message: `Looking for posts matching "${newsroomSearch}".`,
           type: "loading",
           duration: 2000
         });
       } else {
-        setSearchStatus("Showing all reports");
+        setSearchStatus("Showing all posts");
       }
 
       try {
@@ -83,10 +84,11 @@ const NewsroomPage = () => {
           }
         });
         setMyArticles(response.data);
+
         if (newsroomSearch.trim()) {
           showToast({
-            title: "Queue Updated",
-            message: `Found ${response.data.length} matching report${response.data.length === 1 ? "" : "s"}.`,
+            title: "Studio Updated",
+            message: `Found ${response.data.length} matching post${response.data.length === 1 ? "" : "s"}.`,
             type: "info"
           });
         }
@@ -94,7 +96,7 @@ const NewsroomPage = () => {
         setMyArticles([]);
         showToast({
           title: "Search Failed",
-          message: "Unable to refresh your coverage queue right now.",
+          message: "Unable to refresh your studio queue right now.",
           type: "error",
           duration: 4200
         });
@@ -132,16 +134,16 @@ const NewsroomPage = () => {
 
     try {
       showToast({
-        title: formData.status === "published" ? "Publishing Report" : "Saving Draft",
-        message: "Sending your story to the newsroom desk.",
+        title: formData.status === "published" ? "Publishing Post" : "Saving Draft",
+        message: "Sending your story to SAEED DAILY.",
         type: "loading",
         duration: 1800
       });
       const response = await api.post("/articles", formData);
       setMessage(
         formData.status === "published"
-          ? "Report published successfully."
-          : "Draft saved to your world desk."
+          ? "Post published successfully."
+          : "Draft saved to your studio."
       );
       setFormData({
         category: "World",
@@ -154,16 +156,16 @@ const NewsroomPage = () => {
       });
       setNewsroomSearch("");
       showToast({
-        title: formData.status === "published" ? "Report Published" : "Draft Saved",
+        title: formData.status === "published" ? "Post Published" : "Draft Saved",
         message:
           formData.status === "published"
-            ? "Your story is now live on Atlas Wire."
-            : "Your draft is ready in the newsroom queue.",
+            ? "Your post is now live on SAEED DAILY."
+            : "Your draft is ready in your studio queue.",
         type: "success"
       });
       navigate(createArticlePath(response.data));
     } catch (err) {
-      const message = err.response?.data?.message || "Unable to publish your report";
+      const message = err.response?.data?.message || "Unable to publish your post";
       setError(message);
       showToast({
         title: "Publishing Failed",
@@ -185,7 +187,7 @@ const NewsroomPage = () => {
     try {
       showToast({
         title: "Updating Profile",
-        message: "Saving your byline and correspondent details.",
+        message: "Saving your creator details.",
         type: "loading",
         duration: 1800
       });
@@ -197,7 +199,7 @@ const NewsroomPage = () => {
       }));
       showToast({
         title: "Profile Updated",
-        message: "Your byline is refreshed across the publication.",
+        message: "Your byline is refreshed across SAEED DAILY.",
         type: "success"
       });
     } catch (err) {
@@ -218,23 +220,22 @@ const NewsroomPage = () => {
     <div className="space-y-6 lg:space-y-8">
       <section className="animate-fade-up overflow-hidden rounded-[2rem] border border-slate-200 bg-[#07111f] text-white shadow-[0_24px_60px_rgba(15,23,42,0.16)]">
         <div className="grid gap-0 lg:grid-cols-[1.1fr_0.9fr]">
-          <div className="bg-[radial-gradient(circle_at_top,_rgba(216,170,72,0.18),_transparent_35%),linear-gradient(160deg,#07111f_0%,#0d223d_42%,#0d3b66_100%)] p-8 sm:p-10">
+          <div className="bg-[radial-gradient(circle_at_top,_rgba(102,224,194,0.22),_transparent_35%),linear-gradient(160deg,#07111f_0%,#0d223d_42%,#0d3b66_100%)] p-8 sm:p-10">
             <p className="text-[0.72rem] font-bold uppercase tracking-[0.38em] text-white/60">
-              Newsroom Console
+              Creator Studio
             </p>
             <h1 className="mt-5 font-display text-4xl leading-tight sm:text-5xl">
               Welcome back, {user?.name}
             </h1>
             <p className="mt-5 max-w-2xl text-lg leading-8 text-white/74">
-              File world reports, market analysis, sports coverage, entertainment briefs,
-              and science features from a single professional publishing desk.
+              Publish articles, blogs, opinion posts, and video-linked stories from one clean creator dashboard.
             </p>
           </div>
 
           <div className="grid gap-4 bg-white p-6 text-slate-950 sm:grid-cols-2 sm:p-8">
             <div className="rounded-[1.5rem] border border-slate-200 bg-slate-50 p-5">
               <p className="text-[0.72rem] font-bold uppercase tracking-[0.28em] text-slate-500">
-                Active desk
+                Active category
               </p>
               <p className="mt-3 text-3xl font-bold text-slate-950">{formData.category}</p>
             </div>
@@ -248,10 +249,10 @@ const NewsroomPage = () => {
             </div>
             <div className="rounded-[1.5rem] border border-slate-200 bg-slate-50 p-5 sm:col-span-2">
               <p className="text-[0.72rem] font-bold uppercase tracking-[0.28em] text-slate-500">
-                Byline
+                Creator bio
               </p>
               <p className="mt-3 text-lg leading-7 text-slate-600">
-                {user?.bio || "Add a sharp correspondent bio in your profile."}
+                {user?.bio || "Add a clear creator bio in your profile."}
               </p>
             </div>
           </div>
@@ -260,22 +261,22 @@ const NewsroomPage = () => {
 
       <div className="grid gap-8 xl:grid-cols-[0.8fr_1.2fr]">
         <section className="animate-fade-up rounded-[2rem] border border-slate-200 bg-white p-6 shadow-[0_18px_45px_rgba(15,23,42,0.08)] sm:p-8">
-          <h2 className="font-display text-3xl text-slate-950">Correspondent Profile</h2>
+          <h2 className="font-display text-3xl text-slate-950">Creator Profile</h2>
           <p className="mt-3 text-lg leading-8 text-slate-600">
-            Update your byline so every story reads like part of a trusted global network.
+            Update your public creator profile so every post feels personal and trusted.
           </p>
 
-          {profileMessage && (
+          {profileMessage ? (
             <div className="mt-6 rounded-2xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
               {profileMessage}
             </div>
-          )}
+          ) : null}
 
-          {profileError && (
+          {profileError ? (
             <div className="mt-6 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
               {profileError}
             </div>
-          )}
+          ) : null}
 
           <form onSubmit={handleProfileSubmit} className="mt-6 space-y-5">
             <div>
@@ -291,7 +292,7 @@ const NewsroomPage = () => {
                 type="text"
                 value={profileForm.name}
                 onChange={handleProfileChange}
-                className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none transition focus:border-[#b80018] focus:bg-white"
+                className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none transition focus:border-[#4c8df6] focus:bg-white"
               />
             </div>
 
@@ -300,7 +301,7 @@ const NewsroomPage = () => {
                 htmlFor="profile-bio"
                 className="mb-2 block text-sm font-medium uppercase tracking-[0.18em] text-slate-500"
               >
-                Correspondent Bio
+                Creator Bio
               </label>
               <textarea
                 id="profile-bio"
@@ -308,7 +309,7 @@ const NewsroomPage = () => {
                 rows="4"
                 value={profileForm.bio}
                 onChange={handleProfileChange}
-                className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none transition focus:border-[#b80018] focus:bg-white"
+                className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none transition focus:border-[#4c8df6] focus:bg-white"
               />
             </div>
 
@@ -325,7 +326,7 @@ const NewsroomPage = () => {
                 type="password"
                 value={profileForm.password}
                 onChange={handleProfileChange}
-                className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none transition focus:border-[#b80018] focus:bg-white"
+                className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none transition focus:border-[#4c8df6] focus:bg-white"
                 placeholder="Leave blank to keep your current password"
               />
             </div>
@@ -341,23 +342,22 @@ const NewsroomPage = () => {
         </section>
 
         <section className="animate-fade-up rounded-[2rem] border border-slate-200 bg-white p-6 shadow-[0_18px_45px_rgba(15,23,42,0.08)] sm:p-8">
-          <h2 className="font-display text-3xl text-slate-950">File a New Report</h2>
+          <h2 className="font-display text-3xl text-slate-950">Publish a New Post</h2>
           <p className="mt-3 text-lg leading-8 text-slate-600">
-            Publish a polished headline package designed for a BBC-style front page and
-            sector desk.
+            Publish a polished story, attach a YouTube video, and send it straight to the live feed.
           </p>
 
-          {message && (
+          {message ? (
             <div className="mt-6 rounded-2xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
               {message}
             </div>
-          )}
+          ) : null}
 
-          {error && (
+          {error ? (
             <div className="mt-6 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
               {error}
             </div>
-          )}
+          ) : null}
 
           <form onSubmit={handleSubmit} className="mt-6 grid gap-5 md:grid-cols-2">
             <div>
@@ -372,7 +372,7 @@ const NewsroomPage = () => {
                 name="status"
                 value={formData.status}
                 onChange={handleChange}
-                className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none transition focus:border-[#b80018] focus:bg-white"
+                className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none transition focus:border-[#4c8df6] focus:bg-white"
               >
                 <option value="draft">Save as Draft</option>
                 <option value="published">Publish Now</option>
@@ -384,14 +384,14 @@ const NewsroomPage = () => {
                 htmlFor="category"
                 className="mb-2 block text-sm font-medium uppercase tracking-[0.18em] text-slate-500"
               >
-                Desk
+                Category
               </label>
               <select
                 id="category"
                 name="category"
                 value={formData.category}
                 onChange={handleChange}
-                className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none transition focus:border-[#b80018] focus:bg-white"
+                className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none transition focus:border-[#4c8df6] focus:bg-white"
               >
                 {categories.map((category) => (
                   <option key={category} value={category}>
@@ -414,8 +414,8 @@ const NewsroomPage = () => {
                 type="text"
                 value={formData.title}
                 onChange={handleChange}
-                className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none transition focus:border-[#b80018] focus:bg-white"
-                placeholder="Markets brace for..."
+                className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none transition focus:border-[#4c8df6] focus:bg-white"
+                placeholder="A strong headline people will want to open"
                 required
               />
             </div>
@@ -425,7 +425,7 @@ const NewsroomPage = () => {
                 htmlFor="excerpt"
                 className="mb-2 block text-sm font-medium uppercase tracking-[0.18em] text-slate-500"
               >
-                Standfirst
+                Summary
               </label>
               <textarea
                 id="excerpt"
@@ -433,8 +433,8 @@ const NewsroomPage = () => {
                 rows="3"
                 value={formData.excerpt}
                 onChange={handleChange}
-                className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none transition focus:border-[#b80018] focus:bg-white"
-                placeholder="A concise front-page summary that explains why the story matters now."
+                className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none transition focus:border-[#4c8df6] focus:bg-white"
+                placeholder="A concise summary that explains why the post matters."
                 required
               />
             </div>
@@ -452,7 +452,7 @@ const NewsroomPage = () => {
                 type="url"
                 value={formData.featuredImage}
                 onChange={handleChange}
-                className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none transition focus:border-[#b80018] focus:bg-white"
+                className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none transition focus:border-[#4c8df6] focus:bg-white"
                 placeholder="https://images.unsplash.com/..."
                 required
               />
@@ -471,7 +471,7 @@ const NewsroomPage = () => {
                 type="url"
                 value={formData.youtubeUrl}
                 onChange={handleChange}
-                className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none transition focus:border-[#b80018] focus:bg-white"
+                className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none transition focus:border-[#4c8df6] focus:bg-white"
                 placeholder="https://www.youtube.com/watch?v=..."
               />
             </div>
@@ -481,7 +481,7 @@ const NewsroomPage = () => {
                 htmlFor="description"
                 className="mb-2 block text-sm font-medium uppercase tracking-[0.18em] text-slate-500"
               >
-                Story Body
+                Post Body
               </label>
               <textarea
                 id="description"
@@ -489,8 +489,8 @@ const NewsroomPage = () => {
                 rows="8"
                 value={formData.description}
                 onChange={handleChange}
-                className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none transition focus:border-[#b80018] focus:bg-white"
-                placeholder="Write the full report, context, analysis, and the reason it matters to a global audience."
+                className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none transition focus:border-[#4c8df6] focus:bg-white"
+                placeholder="Write the full post, explain the context, and say why people should care."
                 required
               />
             </div>
@@ -499,14 +499,14 @@ const NewsroomPage = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="rounded-full bg-[#b80018] px-6 py-3 text-sm font-bold uppercase tracking-[0.22em] text-white shadow-[0_16px_30px_rgba(184,0,24,0.22)] transition hover:bg-[#d4112b] disabled:cursor-not-allowed disabled:opacity-70"
+                className="rounded-full bg-[#4c8df6] px-6 py-3 text-sm font-bold uppercase tracking-[0.22em] text-white shadow-[0_16px_30px_rgba(76,141,246,0.22)] transition hover:bg-[#3c7add] disabled:cursor-not-allowed disabled:opacity-70"
               >
                 {loading
                   ? formData.status === "published"
                     ? "Publishing..."
                     : "Saving..."
                   : formData.status === "published"
-                    ? "Publish Report"
+                    ? "Publish Post"
                     : "Save Draft"}
               </button>
             </div>
@@ -517,9 +517,9 @@ const NewsroomPage = () => {
       <section className="animate-fade-up rounded-[2rem] border border-slate-200 bg-white p-6 shadow-[0_18px_45px_rgba(15,23,42,0.08)] sm:p-8">
         <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div>
-            <h2 className="font-display text-3xl text-slate-950">Your Coverage Queue</h2>
+            <h2 className="font-display text-3xl text-slate-950">Your Studio Queue</h2>
             <p className="mt-2 text-lg leading-7 text-slate-600">
-              Review drafts and live reports across your desks.
+              Review drafts, published stories, and recent creator updates.
             </p>
           </div>
 
@@ -528,15 +528,15 @@ const NewsroomPage = () => {
               htmlFor="newsroom-search"
               className="mb-2 block text-sm font-medium uppercase tracking-[0.18em] text-slate-500"
             >
-              Search your reports
+              Search your posts
             </label>
             <input
               id="newsroom-search"
               type="search"
               value={newsroomSearch}
               onChange={(event) => setNewsroomSearch(event.target.value)}
-              className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none transition focus:border-[#b80018] focus:bg-white"
-              placeholder="Search drafts, live updates, and desk coverage..."
+              className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none transition focus:border-[#4c8df6] focus:bg-white"
+              placeholder="Search drafts, live posts, and category updates..."
             />
             <p className="mt-3 text-xs font-semibold uppercase tracking-[0.16em] text-[#6f6758]">
               {queueLoading ? "Refreshing your queue..." : searchStatus}
@@ -546,12 +546,12 @@ const NewsroomPage = () => {
 
         <div className="mt-6 grid gap-4">
           {queueLoading ? (
-            <div className="paper-panel rounded-[1.5rem] border border-[#d9cfba] p-6 text-[#6f6758]">
-              Loading your coverage queue...
+            <div className="daily-card rounded-[1.5rem] border border-[rgba(255,255,255,0.12)] p-6 text-[#6f6758]">
+              Loading your studio queue...
             </div>
           ) : myArticles.length === 0 ? (
             <div className="rounded-[1.5rem] border border-dashed border-slate-300 bg-slate-50 p-6 text-slate-500">
-              No reports found in your queue yet.
+              No posts found in your queue yet.
             </div>
           ) : (
             myArticles.map((article) => (
@@ -561,7 +561,7 @@ const NewsroomPage = () => {
               >
                 <div>
                   <div className="flex flex-wrap items-center gap-3 text-[0.72rem] font-bold uppercase tracking-[0.24em] text-slate-500">
-                    <span className="rounded-full bg-[#b80018] px-3 py-1 text-white">
+                    <span className="rounded-full bg-[#4c8df6] px-3 py-1 text-white">
                       {article.category}
                     </span>
                     <span>{article.status === "published" ? "live" : "draft"}</span>
@@ -577,9 +577,9 @@ const NewsroomPage = () => {
                   <button
                     type="button"
                     onClick={() => navigate(createArticlePath(article))}
-                    className="rounded-full border border-slate-300 px-4 py-2 text-sm font-bold uppercase tracking-[0.18em] text-slate-800 transition hover:border-[#b80018] hover:text-[#b80018]"
+                    className="rounded-full border border-slate-300 px-4 py-2 text-sm font-bold uppercase tracking-[0.18em] text-slate-800 transition hover:border-[#4c8df6] hover:text-[#4c8df6]"
                   >
-                    Open
+                    Open Post
                   </button>
                 </div>
               </article>

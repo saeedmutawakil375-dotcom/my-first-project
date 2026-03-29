@@ -1,19 +1,19 @@
-@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;800&family=Playfair+Display:wght@600;700;800&display=swap");
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --news-bg: #f4efe4;
-  --news-surface: #fffdf7;
-  --news-panel: #f6f0e4;
-  --news-ink: #18212d;
-  --news-muted: #6f6758;
-  --news-line: rgba(24, 33, 45, 0.12);
-  --news-accent: #a12c2f;
-  --news-blue: #184c53;
-  --news-gold: #ba8d3f;
+  --news-bg: #eef3f8;
+  --news-surface: #ffffff;
+  --news-panel: #f7fbff;
+  --news-ink: #08131f;
+  --news-muted: #5c6775;
+  --news-line: rgba(8, 19, 31, 0.1);
+  --news-accent: #4c8df6;
+  --news-blue: #10283d;
+  --news-gold: #66e0c2;
 }
 
 * {
@@ -26,11 +26,12 @@ html {
 
 body {
   margin: 0;
-  font-family: "Manrope", "Segoe UI", sans-serif;
+  font-family: "DM Sans", "Segoe UI", sans-serif;
   color: var(--news-ink);
   background:
-    radial-gradient(circle at top, rgba(24, 76, 83, 0.12), transparent 28%),
-    linear-gradient(180deg, #fbf7ee 0%, #f4efe4 46%, #efe8d9 100%);
+    radial-gradient(circle at top, rgba(102, 224, 194, 0.12), transparent 22%),
+    radial-gradient(circle at right, rgba(76, 141, 246, 0.1), transparent 26%),
+    linear-gradient(180deg, #eff4fa 0%, #edf2f8 48%, #e8eef5 100%);
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -45,7 +46,7 @@ h2,
 h3,
 h4,
 .font-display {
-  font-family: "Cormorant Garamond", Georgia, serif;
+  font-family: "Playfair Display", Georgia, serif;
   letter-spacing: -0.02em;
 }
 
@@ -68,7 +69,7 @@ img {
 }
 
 ::selection {
-  background: rgba(161, 44, 47, 0.18);
+  background: rgba(76, 141, 246, 0.18);
 }
 
 .news-shell {
@@ -81,8 +82,8 @@ img {
   inset: 0;
   pointer-events: none;
   background:
-    linear-gradient(90deg, rgba(255, 250, 239, 0.66), transparent 18%, transparent 82%, rgba(255, 250, 239, 0.66)),
-    linear-gradient(180deg, transparent, rgba(24, 33, 45, 0.03));
+    linear-gradient(90deg, rgba(255, 255, 255, 0.35), transparent 16%, transparent 84%, rgba(255, 255, 255, 0.35)),
+    linear-gradient(180deg, transparent, rgba(8, 19, 31, 0.02));
 }
 
 .glass-panel {
@@ -95,15 +96,15 @@ img {
 
 .paper-panel {
   background:
-    linear-gradient(180deg, rgba(255, 253, 247, 0.98), rgba(247, 239, 225, 0.96)),
-    radial-gradient(circle at top left, rgba(186, 141, 63, 0.08), transparent 34%);
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(247, 251, 255, 0.96)),
+    radial-gradient(circle at top left, rgba(76, 141, 246, 0.06), transparent 34%);
 }
 
-.ticker-track {
-  display: inline-flex;
-  min-width: max-content;
-  gap: 2rem;
-  animation: ticker-scroll 26s linear infinite;
+.daily-card {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 251, 255, 0.96)),
+    radial-gradient(circle at top left, rgba(102, 224, 194, 0.08), transparent 32%);
+  backdrop-filter: blur(16px);
 }
 
 .animate-fade-up {
@@ -128,16 +129,6 @@ img {
 
 .delay-3 {
   animation-delay: 0.24s;
-}
-
-@keyframes ticker-scroll {
-  from {
-    transform: translateX(0);
-  }
-
-  to {
-    transform: translateX(-50%);
-  }
 }
 
 @keyframes fade-up {
@@ -171,5 +162,13 @@ img {
   to {
     opacity: 1;
     transform: translateX(0);
+  }
+}
+
+@media (max-width: 640px) {
+  body {
+    background:
+      radial-gradient(circle at top, rgba(102, 224, 194, 0.12), transparent 18%),
+      linear-gradient(180deg, #f1f6fb 0%, #edf2f8 100%);
   }
 }
